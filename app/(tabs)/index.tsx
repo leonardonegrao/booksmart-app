@@ -1,14 +1,44 @@
 import { StyleSheet } from 'react-native';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import BookItem from '@/components/home/book';
 
-export default function TabOneScreen() {
+const startedBooks = [
+  {
+    id: 'a-promised-land',
+    title: 'A Promised Land',
+    author: 'Barack Obama',
+    coverUrl: require('@/assets/images/books/a-promised-land.png'),
+    percentageRead: 46,
+  },
+  {
+    id: 'blade-runner',
+    title: 'Blade Runner',
+    author: 'Philip K. Dick',
+    coverUrl: require('@/assets/images/books/blade-runner.png'),
+    percentageRead: 68,
+  }
+]
+
+export default function Home() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <View style={styles.section}>
+        <Text style={styles.title}>
+          Continue reading ({startedBooks.length})
+        </Text>
+
+        <View style={styles.booksList}>
+          {startedBooks.map(book => (
+            <BookItem
+              key={book.id}
+              title={book.title}
+              coverUrl={book.coverUrl}
+              percentageRead={book.percentageRead}
+            />
+          ))}
+        </View>
+      </View>  
     </View>
   );
 }
@@ -16,16 +46,20 @@ export default function TabOneScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    padding: 16,
+  },
+  section: {
+    gap: 14,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 17,
+    fontFamily: 'Bitter_700Bold',
+    color: '#1E1E1E'
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
+  booksList: {
+    flexDirection: 'row',
+    gap: 16,
+  }
 });
