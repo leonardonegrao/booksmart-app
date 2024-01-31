@@ -91,4 +91,26 @@ const SettingsIcon = (props: SvgProps) => (
   </Svg>
 )
 
-export { LibraryIcon, UploadBookIcon, BookmarkIcon, SettingsIcon }
+const UploadSquare = (props: SvgProps) => (
+  <Svg
+    width={49}
+    height={48}
+    fill="none"
+    {...props}
+  >
+    <Path
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={3}
+      d="M24.5 16v16m0-16c-1.4 0-4.017 3.989-5 5m5-5c1.4 0 4.017 3.989 5 5"
+    />
+    <Path
+      stroke="currentColor"
+      strokeWidth={3}
+      d="M5.5 24c0-8.957 0-13.435 2.782-16.218C11.065 5 15.543 5 24.5 5s13.435 0 16.218 2.782C43.5 10.565 43.5 15.043 43.5 24s0 13.435-2.782 16.218C37.935 43 33.457 43 24.5 43s-13.435 0-16.218-2.782C5.5 37.435 5.5 32.957 5.5 24Z"
+    />
+  </Svg>
+)
+
+export { LibraryIcon, UploadBookIcon, BookmarkIcon, SettingsIcon, UploadSquare }

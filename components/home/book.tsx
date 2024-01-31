@@ -12,9 +12,12 @@ export default function BookItem({ title, coverUrl, percentageRead }: BookItemPr
     <View style={styles.container}>
       <Image
         source={coverUrl}
-        contentFit="cover"
         style={styles.cover}
       />
+
+      <Text style={styles.title}>
+        {title}
+      </Text>
 
       <View style={{ backgroundColor: 'transparent', gap: 4, alignItems: 'flex-end' }}>
         <View style={styles.progressBackground}>
@@ -32,8 +35,10 @@ export default function BookItem({ title, coverUrl, percentageRead }: BookItemPr
 const styles = StyleSheet.create({
   container: {
     width: 171,
-    height: 261,
+    height: 311,
+    // aspectRatio: 171 / 261,
     borderRadius: 7,
+
     shadowOffset: {
       width: 0,
       height: 8
@@ -45,9 +50,17 @@ const styles = StyleSheet.create({
   },
   cover: {
     flex: 1,
-    width: '100%',
+    width: 171,
+    height: 311,
+    // aspectRatio: 171 / 261,
     borderRadius: 7,
     marginBottom: 6,
+  },
+  title: {
+    fontSize: 14,
+    fontFamily: 'Bitter_700Bold',
+    color: '#1E1E1E',
+    marginBottom: 5,
   },
   progressBackground: {
     position: 'relative',

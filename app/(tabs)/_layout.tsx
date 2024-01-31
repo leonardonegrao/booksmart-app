@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Link, Slot } from 'expo-router';
+import { Link, Slot, router } from 'expo-router';
 import { Pressable } from 'react-native';
 
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -35,6 +35,15 @@ function TabItem({ children, label, isActive }: { children: React.ReactNode; lab
 export default function TabLayout() {
   const [activeTab, setActiveTab] = useState<Tab>('library')
 
+  const handleTabPress = (tab: Tab) => {
+    setActiveTab(tab)
+    
+    if (tab === 'library')
+      router.push('/(tabs)/')
+    else
+      router.push('/(tabs)/upload')
+  }
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.layout}>
@@ -42,14 +51,14 @@ export default function TabLayout() {
         <View style={styles.tabsContainer}>
           <View style={styles.tabs}>
             {tabList.map(({ id, label, icon }) => (
-              <TabItem key={id}  label={label} isActive={activeTab === id}>
-                <Pressable onPress={() => setActiveTab(id as Tab)}>
-                  {icon({
-                    color: activeTab === id ? '#FF9D42' : '#939393',
-                    strokeWidth: activeTab === id ? 1.5 : 1.0,
-                  })}
-                </Pressable>
-              </TabItem>
+              <Pressable key={id} onPress={() => handleTabPress(id as Tab)} style={styles.tabContainer}>
+                <TabItem label={label} isActive={activeTab === id}>
+                    {icon({
+                      color: activeTab === id ? '#FF9D42' : '#939393',
+                      strokeWidth: activeTab === id ? 1.5 : 1.0,
+                    })}
+                </TabItem>
+              </Pressable>
             ))}
           </View>
         </View>
@@ -92,12 +101,14 @@ const styles = StyleSheet.create({
       width: 0,
     }
   },
-  tab: {
+  tabContainer: {
     flex: 1,
+    alignItems: 'center',
+  },
+  tab: {
     justifyContent: 'center',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'transparent',
   },
   tabLabel: {
     fontSize: 12,
