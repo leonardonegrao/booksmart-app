@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Link, Slot, Tabs } from 'expo-router';
+import { StyleSheet, Text, View } from 'react-native';
+import { Link, Slot } from 'expo-router';
 import { Pressable } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { BookmarkIcon, LibraryIcon, SettingsIcon, UploadBookIcon } from '@/components/icons';
 

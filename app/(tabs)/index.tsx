@@ -1,6 +1,5 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
 import BookItem from '@/components/home/book';
 
 const startedBooks = [
