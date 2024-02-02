@@ -113,4 +113,31 @@ const UploadSquare = (props: SvgProps) => (
   </Svg>
 )
 
-export { LibraryIcon, UploadBookIcon, BookmarkIcon, SettingsIcon, UploadSquare }
+const EyeOpen = (props: SvgProps) => (
+  <Svg
+    width={24}
+    height={25}
+    fill="none"
+    {...props}
+  >
+    <Path
+      stroke="currentColor"
+      strokeWidth={1.5}
+      d="M21.544 11.125c.304.426.456.64.456.955 0 .316-.152.529-.456.955-1.366 1.916-4.855 6.045-9.544 6.045-4.69 0-8.178-4.13-9.544-6.045-.304-.426-.456-.64-.456-.955 0-.316.152-.529.456-.955C3.822 9.209 7.311 5.08 12 5.08c4.69 0 8.178 4.13 9.544 6.045Z"
+    />
+    <Path
+      stroke="currentColor"
+      strokeWidth={1.5}
+      d="M15 12.08a3 3 0 1 0-6 0 3 3 0 0 0 6 0Z"
+    />
+</Svg>
+)
+
+export {
+  LibraryIcon,
+  UploadBookIcon,
+  BookmarkIcon,
+  SettingsIcon,
+  UploadSquare,
+  EyeOpen
+}

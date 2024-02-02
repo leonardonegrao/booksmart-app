@@ -1,11 +1,27 @@
-import { StyleSheet, Text, TouchableOpacity } from "react-native"
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from "react-native"
+import type { GestureResponderEvent } from "react-native"
 
-export default function Button({ label }: { label: string }) {
+interface ButtonProps {
+  label: string;
+  onPress?: ((event: GestureResponderEvent) => void) | undefined;
+  state?: 'default' | 'loading' | 'disabled';
+}
+
+export default function Button({ label, onPress, state = 'default' }: ButtonProps) {
   return (
-    <TouchableOpacity style={styles.button}>
-      <Text style={{ fontSize: 12, fontFamily: 'Bitter_700Bold', color: '#FFE4CB' }}>
-        {label}
-      </Text>
+    <TouchableOpacity
+      style={state !== 'default' ? { ...styles.button, ...styles.disabled } : styles.button}
+      onPress={onPress}
+    >
+      {state === 'loading' ? (
+        <ActivityIndicator color="#939393" />
+      ) : (
+        <Text
+          style={state !== 'default' ? { ...styles.label, ...styles.labelDisabled } : styles.label}
+        >
+          {label}
+        </Text>
+      )}
     </TouchableOpacity>
   )
 }
@@ -18,5 +34,16 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: '#FD7900',
     borderRadius: 7,
+  },
+  disabled: {
+    backgroundColor: '#F2F2F2',
+  },
+  label: {
+    fontSize: 14,
+    fontFamily: 'Inter_500Medium',
+    color: '#FFE4CB'
+  },
+  labelDisabled: {
+    color: '#939393',
   },
 })

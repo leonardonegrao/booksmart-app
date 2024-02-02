@@ -39,9 +39,9 @@ export default function TabLayout() {
     setActiveTab(tab)
     
     if (tab === 'library')
-      router.push('/(tabs)/')
+      router.push('/(app)/(tabs)/')
     else
-      router.push('/(tabs)/upload')
+      router.push('/(app)/(tabs)/upload')
   }
 
   return (

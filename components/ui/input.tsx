@@ -1,19 +1,33 @@
-import { StyleSheet, TextInput } from "react-native"
+import { StyleSheet, TextInput, TextInputProps, View } from "react-native"
 
-export default function Input({ placeholder }: { placeholder: string }) {
+interface InputProps extends TextInputProps {
+  children?: React.ReactNode;
+}
+
+export default function Input({children, ...rest}: TextInputProps) {
   return (
-    <TextInput
-      placeholder={placeholder}
-      style={styles.input}
-    />
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        {...rest}
+      />
+
+      {children}
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  input: {
+  container: {
+    flexDirection: 'row',
     backgroundColor: '#F2F2F2',
     padding: 15,
     borderRadius: 7,
     width: '100%',
+    height: 52,
+  },
+  input: {
+    flex: 1,
+    height: '100%',
   }
 })

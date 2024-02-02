@@ -11,9 +11,11 @@ import {
   Bitter_600SemiBold,
   Bitter_700Bold
 } from '@expo-google-fonts/bitter'
-import { Stack } from 'expo-router';
+import { Redirect, Slot, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { Text } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -55,13 +57,9 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <AuthProvider>
+      <Slot />
+    </AuthProvider>
   );
 }
