@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Link, Slot, router } from 'expo-router';
+import { Link, Redirect, Slot, router } from 'expo-router';
 import { Pressable } from 'react-native';
 
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { BookmarkIcon, LibraryIcon, SettingsIcon, UploadBookIcon } from '@/components/icons';
+import { useAuth } from '@/context/AuthContext';
 
 type Tab = 'library' | 'upload' | 'history' | 'settings'
 
@@ -34,14 +35,24 @@ function TabItem({ children, label, isActive }: { children: React.ReactNode; lab
 
 export default function TabLayout() {
   const [activeTab, setActiveTab] = useState<Tab>('library')
+  const { authState } = useAuth();
+  const isLoading = authState?.authenticated === null;
+
+  if (isLoading) {
+    return <Text>Loading...</Text>
+  }
+
+  if (!authState?.authenticated && !isLoading) {
+    return <Redirect href='/login' />
+  }
 
   const handleTabPress = (tab: Tab) => {
     setActiveTab(tab)
     
     if (tab === 'library')
-      router.push('/(app)/(tabs)/')
+      router.push('/(tabs)/')
     else
-      router.push('/(app)/(tabs)/upload')
+      router.push('/(tabs)/upload')
   }
 
   return (

@@ -6,13 +6,26 @@ import Input from "@/components/ui/input";
 import { EyeOpen } from "@/components/icons";
 import { useState } from "react";
 import Button from "@/components/ui/button";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const { onLogin } = useAuth();
 
-  const handleLogin = () => {
-    // TODO: login
+  const handleLogin = async () => {
+    const result = await onLogin!(email, password);
+
+    if (result && result.error) {
+      console.log('error', result.message);
+      alert(result.message);
+    }
+
+    if (result.status === 200) {
+      router.replace('/(tabs)');
+    }
   }
 
   return (
@@ -27,11 +40,15 @@ export default function Login() {
           placeholder="E-mail"
           autoCapitalize="none"
           textContentType="emailAddress"
+          value={email}
+          onChangeText={(text: string) => setEmail(text)}
         />
         <Input
           placeholder="Password"
           textContentType="password"
           secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={(text: string) => setPassword(text)}
         >
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <EyeOpen color={showPassword ? '#FF9D42' : '#939393'} />
