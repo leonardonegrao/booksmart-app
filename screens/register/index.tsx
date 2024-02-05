@@ -8,10 +8,10 @@ import { EyeOpen } from "@/components/icons";
 import Button from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
-import logo from '@/assets/images/logo/logo-orange-text.png';
+import logo from "@/assets/images/logo/logo-orange-text.png";
 
 export default function RegisterScreen() {
-  const [formState, setFormState] = useState<'default' | 'loading' | 'disabled'>("default");
+  const [formState, setFormState] = useState<"default" | "loading" | "disabled">("default");
   const [email, setEmail] = useState("");
   const [fullname, setFullname] = useState("");
   const [username, setUsername] = useState("");
@@ -30,25 +30,22 @@ export default function RegisterScreen() {
     });
 
     if (result && result.error) {
-      console.log('error', result.message);
       alert(result.message);
     }
 
     if (result.status === 201) {
-      console.log('success');
 
       const result = await onLogin!(email, password);
 
       if (result && result.error) {
-        console.log('error', result.message);
         alert(result.message);
       }
 
       if (result.status === 200) {
-        router.replace('/(tabs)');
+        router.replace("/(tabs)");
       }
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -87,24 +84,25 @@ export default function RegisterScreen() {
           onChangeText={(text: string) => setPassword(text)}
         >
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <EyeOpen color={showPassword ? '#FF9D42' : '#939393'} />
+            <EyeOpen color={showPassword ? "#FF9D42" : "#939393"} />
           </TouchableOpacity>
         </Input>
 
         <Button
           label="Create account"
           onPress={handleRegistration}
+          state={formState}
         />
       </View>
 
       <View style={styles.registerContainer}>
         <Text
-          style={{ fontFamily: 'Bitter_400Regular', color: "#1E1E1E", opacity: 0.7 }}
+          style={{ fontFamily: "Bitter_400Regular", color: "#1E1E1E", opacity: 0.7 }}
         >
           Already registered?
         </Text>
 
-        <Link href="/login" style={{ color: "#FF9D42", fontFamily: 'Bitter_700Bold', fontSize: 16 }}>
+        <Link href="/login" style={{ color: "#FF9D42", fontFamily: "Bitter_700Bold", fontSize: 16 }}>
           Login into your account
         </Link>
       </View>
@@ -115,9 +113,9 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#FAFAFA",
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 16,
   },
   logo: {
@@ -127,11 +125,11 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     gap: 8,
-    width: '100%',
+    width: "100%",
     marginBottom: 24,
   },
   registerContainer: {
     gap: 16,
-    alignItems: 'center',
-  }
+    alignItems: "center",
+  },
 });
