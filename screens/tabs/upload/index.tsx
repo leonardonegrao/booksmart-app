@@ -28,6 +28,7 @@ export default function UploadScreen() {
           <View style={{ gap: 8 }}>
             <Input placeholder="Title" />
             <Input placeholder="Author" />
+            <Input placeholder="Language" />
           </View>
 
           <Button label="Save book" />

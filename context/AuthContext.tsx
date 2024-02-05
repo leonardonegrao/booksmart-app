@@ -9,6 +9,16 @@ type RegisterInput = {
   fullname: string;
 }
 
+type AuthenticationData = {
+  token: string | null;
+  authenticated: boolean | null;
+  userData?: {
+    email: string;
+    fullname: string;
+    username: string;
+  };
+}
+
 interface AuthProps {
   authState?: { token: string | null; authenticated: boolean | null };
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
@@ -28,10 +38,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [authState, setAuthState] = useState<{
-    token: string | null;
-    authenticated: boolean | null;
-  }>({
+  const [authState, setAuthState] = useState<AuthenticationData>({
     token: null,
     authenticated: null,
   });
@@ -77,14 +84,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { error: true, message: result.data.message };
       }
 
+      const userData = {
+        email: result.data.email,
+        fullname: result.data.fullname,
+        username: result.data.username,
+      };
+
       setAuthState({
         token: result.data.accessToken,
         authenticated: true,
+        userData,
       });
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${result.data.accessToken}`;
 
       await SecureStore.setItemAsync(TOKEN_KEY, result.data.accessToken);
+      await SecureStore.setItemAsync("userData", JSON.stringify(userData));
 
       return result;
     } catch (e) {
@@ -95,6 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
+    await SecureStore.deleteItemAsync("userData");
     axios.defaults.headers.common["Authorization"] = "";
 
     setAuthState({
