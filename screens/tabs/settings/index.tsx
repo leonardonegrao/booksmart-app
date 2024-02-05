@@ -74,7 +74,7 @@ export default function SettingsScreen() {
             </View>
 
             <View style={styles.profileInfoLink}>
-              <Link href="/" style={{ color: "#FF9D42", fontSize: 12, fontFamily: "Inter_500Medium" }}>
+              <Link href="/" style={{ color: "#FF9D42", fontSize: 12, fontFamily: "sans-medium" }}>
                 Change account information
               </Link>
               <ChevronRight color="#FF9D42" />
@@ -110,7 +110,7 @@ export default function SettingsScreen() {
 
       <View style={{ ...styles.settingsItemContainer, width: "100%" }}>
         <TouchableOpacity>
-          <Text style={{ color: "#ED7979", fontSize: 14, fontFamily: "Inter_500Medium", paddingVertical: 12 }}>
+          <Text style={{ color: "#ED7979", fontSize: 14, fontFamily: "sans-medium", paddingVertical: 12 }}>
             Delete account
           </Text>
         </TouchableOpacity>
@@ -118,7 +118,7 @@ export default function SettingsScreen() {
 
       <View style={{ flexDirection: "row", width: "100%", justifyContent: "center" }}>
         <TouchableOpacity onPress={handleLogout}>
-          <Text style={{ color: "#ED7979", fontSize: 14, fontFamily: "Inter_500Medium" }}>
+          <Text style={{ color: "#ED7979", fontSize: 14, fontFamily: "sans-medium" }}>
             Log out
           </Text>
         </TouchableOpacity>
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 17,
-    fontFamily: "Bitter_700Bold",
+    fontFamily: "serif-bold",
     color: "#1E1E1E",
   },
   profile: {
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   profilePictureText: {
     fontSize: 32,
-    fontFamily: "Inter_700Bold",
+    fontFamily: "sans-semibold",
     color: "#FFD7C1",
   },
   profileInfo: {
@@ -174,26 +174,26 @@ const styles = StyleSheet.create({
   },
   profileInfoName: {
     fontSize: 14,
-    fontFamily: "Inter_600SemiBold",
+    fontFamily: "sans-semibold",
     color: "#1E1E1E",
     opacity: 0.7,
   },
   profileInfoHandle: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "sans-regular",
     color: "#1E1E1E",
     opacity: 0.5,
   },
   profileInfoMail: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "sans-regular",
     color: "#1E1E1E",
     opacity: 0.5,
   },
   profileInfoLink: {
     flexDirection: "row",
     fontSize: 12,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "sans-medium",
     color: "#FF9D42",
     alignItems: "center",
     justifyContent: "flex-end",
@@ -209,14 +209,14 @@ const styles = StyleSheet.create({
   },
   settingsItemTitle: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "sans-medium",
     color: "#1E1E1E",
     opacity: 0.8,
     marginBottom: 4,
   },
   settingsItemSubtitle: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
+    fontFamily: "sans-regular",
     color: "#1E1E1E",
     opacity: 0.6,
   },

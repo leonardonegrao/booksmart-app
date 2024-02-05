@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
+import Text from "@/components/ui/text";
 import BookItem from "@/components/home/book";
 
 const startedBooks = [
@@ -23,7 +24,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.section}>
-        <Text style={styles.title}>
+        <Text fontType="serifBold" style={styles.title}>
           Continue reading ({startedBooks.length})
         </Text>
 
@@ -54,7 +55,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 17,
-    fontFamily: "Bitter_700Bold",
     color: "#1E1E1E",
   },
   booksList: {

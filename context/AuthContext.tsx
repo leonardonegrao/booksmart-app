@@ -13,6 +13,7 @@ type AuthenticationData = {
   token: string | null;
   authenticated: boolean | null;
   userData?: {
+    id: string;
     email: string;
     fullname: string;
     username: string;
@@ -30,7 +31,7 @@ interface AuthProps {
 }
 
 const TOKEN_KEY = "token";
-export const API_URL = "http://localhost:3333";
+export const API_URL = "http://192.168.1.206:3333";
 const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = () => {
@@ -88,6 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email: result.data.email,
         fullname: result.data.fullname,
         username: result.data.username,
+        id: result.data.id,
       };
 
       setAuthState({
@@ -104,6 +106,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return result;
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      console.log(e);
       return { error: true, message: (e as any).response.data.error };
     }
   };

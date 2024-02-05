@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
-    fontFamily: "Bitter_700Bold",
+    fontFamily: "serif-bold",
     color: "#1E1E1E",
     marginBottom: 5,
   },
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     fontSize: 12,
-    fontFamily: "Bitter_700Bold",
+    fontFamily: "serif-bold",
     color: "#1E1E1E",
     opacity: 0.5,
   },

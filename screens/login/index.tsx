@@ -63,12 +63,12 @@ export default function LoginScreen() {
 
       <View style={styles.registerContainer}>
         <Text
-          style={{ fontFamily: "Bitter_400Regular", color: "#1E1E1E", opacity: 0.7 }}
+          style={{ fontFamily: "serif-regular", color: "#1E1E1E", opacity: 0.7 }}
         >
           Don't have an account?
         </Text>
 
-        <Link href="/register" style={{ color: "#FF9D42", fontFamily: "Bitter_700Bold", fontSize: 16 }}>
+        <Link href="/register" style={{ color: "#FF9D42", fontFamily: "serif-bold", fontSize: 16 }}>
           Create your account
         </Link>
       </View>

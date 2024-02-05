@@ -1,5 +1,5 @@
+import { useFonts } from "expo-font";
 import {
-  useFonts,
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
@@ -31,14 +31,14 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    Bitter_400Regular,
-    Bitter_500Medium,
-    Bitter_600SemiBold,
-    Bitter_700Bold,
+    "sans-regular": Inter_400Regular,
+    "sans-medium": Inter_500Medium,
+    "sans-semibold": Inter_600SemiBold,
+    "sans-bold": Inter_700Bold,
+    "serif-regular": Bitter_400Regular,
+    "serif-medium": Bitter_500Medium,
+    "serif-semibold": Bitter_600SemiBold,
+    "serif-bold": Bitter_700Bold,
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.

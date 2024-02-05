@@ -24,7 +24,7 @@ function TabItem({ children, label, isActive }: { children: React.ReactNode; lab
         style={{
           ...styles.tabLabel,
           color: isActive ? "#FF9D42" : "#939393",
-          fontFamily: isActive ? "Inter_600SemiBold" : "Inter_400Regular",
+          fontFamily: isActive ? "sans-semibold" : "sans-regular",
         }}
       >
         {label}

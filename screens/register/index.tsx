@@ -97,12 +97,12 @@ export default function RegisterScreen() {
 
       <View style={styles.registerContainer}>
         <Text
-          style={{ fontFamily: "Bitter_400Regular", color: "#1E1E1E", opacity: 0.7 }}
+          style={{ fontFamily: "serif-regular", color: "#1E1E1E", opacity: 0.7 }}
         >
           Already registered?
         </Text>
 
-        <Link href="/login" style={{ color: "#FF9D42", fontFamily: "Bitter_700Bold", fontSize: 16 }}>
+        <Link href="/login" style={{ color: "#FF9D42", fontFamily: "serif-bold", fontSize: 16 }}>
           Login into your account
         </Link>
       </View>

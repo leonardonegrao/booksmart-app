@@ -1,18 +1,19 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import FileInput from "@/components/ui/file-input";
+import Text from "@/components/ui/text";
 
 export default function UploadScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.pageTitle}>
+        <Text fontType="serifBold" style={styles.pageTitle}>
           Book metadata
         </Text>
 
-        <Text style={styles.pageSubtitle}>
+        <Text fontType="sansRegular" style={styles.pageSubtitle}>
           Once your file is uploaded, you can edit the metadata if you need
         </Text>
       </View>
@@ -61,12 +62,10 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 17,
-    fontFamily: "Bitter_700Bold",
     color: "#1E1E1E",
   },
   pageSubtitle: {
     fontSize: 12,
-    fontFamily: "Inter_400Regular",
     color: "#1E1E1E",
     opacity: 0.6,
   },

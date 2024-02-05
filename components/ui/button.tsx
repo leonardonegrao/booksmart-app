@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontFamily: "Inter_500Medium",
+    fontFamily: "sans-medium",
     color: "#FFE4CB",
   },
   labelDisabled: {

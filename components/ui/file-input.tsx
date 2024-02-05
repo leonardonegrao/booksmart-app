@@ -52,19 +52,19 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#939393",
-    fontFamily: "Bitter_700Bold",
+    fontFamily: "serif-bold",
     fontSize: 17,
   },
   instruction: {
     color: "#939393",
-    fontFamily: "Bitter_400Regular",
+    fontFamily: "serif-regular",
     fontSize: 14,
     marginBottom: 4,
   },
   fileTypes: {
     color: "#939393",
     opacity: 0.7,
-    fontFamily: "Bitter_400Regular",
+    fontFamily: "serif-regular",
     fontSize: 12,
   },
 });
