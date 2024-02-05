@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: any) => {
 
   const register = async (input: RegisterInput) => {
     try {
-      return await axios.post(`${API_URL}/signup`, input);
+      return await axios.post(`${API_URL}/users`, input);
     } catch (e) {
       return { error: true, message: (e as any).response.data.message };
     }
