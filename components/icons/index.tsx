@@ -133,6 +133,23 @@ const EyeOpen = (props: SvgProps) => (
 </Svg>
 );
 
+const ChevronRight = (props: SvgProps) => (
+  <Svg
+    width={16}
+    height={16}
+    fill="none"
+    {...props}
+  >
+    <Path
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.5}
+      d="M6 4s4 2.946 4 4c0 1.054-4 4-4 4"
+    />
+  </Svg>
+);
+
 export {
   LibraryIcon,
   UploadBookIcon,
@@ -140,4 +157,5 @@ export {
   SettingsIcon,
   UploadSquare,
   EyeOpen,
+  ChevronRight,
 };

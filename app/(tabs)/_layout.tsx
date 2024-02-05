@@ -51,6 +51,8 @@ export default function TabLayout() {
     
     if (tab === "library")
       router.push("/(tabs)/");
+    else if (tab === "settings")
+      router.push("/(tabs)/settings");
     else
       router.push("/(tabs)/upload");
   };

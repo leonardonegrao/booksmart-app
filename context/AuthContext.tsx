@@ -47,6 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           token,
           authenticated: true,
         });
+
+        return;
       }
 
       setAuthState({
