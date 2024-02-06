@@ -1,32 +1,77 @@
 import * as DocumentPicker from "expo-document-picker";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { UploadSquare } from "../icons";
+import { useState } from "react";
 
 interface FileInputProps {
   title: string;
   instruction: string;
   fileTypesLabel?: string;
   fileTypes: string | string[];
+  value: HandleUploadResponse | null;
+  // eslint-disable-next-line no-unused-vars
+  onChange: (file: HandleUploadResponse) => Promise<void>;
 }
 
-export default function FileInput({ title, instruction, fileTypesLabel, fileTypes }: FileInputProps) {
+export interface HandleUploadResponse {
+  name: string;
+  uri: string;
+  type?: string;
+  size?: number;
+}
+
+type FileInputState = "default" | "uploading" | "uploaded" | "error";
+
+export default function FileInput({ title, instruction, fileTypesLabel, fileTypes, value, onChange }: FileInputProps) {
+  const [state, setState] = useState<FileInputState>("default");
+
   const handleUpload = async () => {
-    await DocumentPicker.getDocumentAsync({ type: fileTypes });
+    setState("uploading");
+
+    try {
+      const docRes = await DocumentPicker.getDocumentAsync({ type: fileTypes });
+      const assets = docRes.assets;
+
+      if (!assets)
+        return;
+
+      const fileData = assets[0];
+
+      const file: HandleUploadResponse = {
+        name: fileData.name,
+        uri: fileData.uri,
+        type: fileData.mimeType,
+        size: fileData.size,
+      };
+      
+      await onChange(file);
+
+      setState("uploaded");
+    } catch (e) {
+      setState("error");
+    }
+
   };
 
   return (
     <TouchableOpacity onPress={handleUpload}>
       <View style={styles.container}>
         <Text style={styles.title}>
-          {title}
+          {state === "default" && title}
+          {state === "uploading" && "Uploading..."}
+          {state === "uploaded" && "Uploaded"}
+          {state === "error" && "Error while uploading file"}
         </Text>
 
-        <UploadSquare color="#939393" />
+        {state === "default" && <UploadSquare color="#939393" />}
+        {state === "uploading" && <ActivityIndicator color="#939393" />}
 
         <View style={{ alignItems: "center" }}>
           <Text style={styles.instruction}>
-            {instruction}
+          {state === "default" && instruction}
+          {state === "uploading" && value?.name}
+          {state === "uploaded" && value?.name}
           </Text>
 
           {fileTypesLabel && (

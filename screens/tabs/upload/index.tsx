@@ -2,10 +2,41 @@ import { StyleSheet, View } from "react-native";
 
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
-import FileInput from "@/components/ui/file-input";
+import FileInput, { HandleUploadResponse } from "@/components/ui/file-input";
 import Text from "@/components/ui/text";
+import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import api from "@/services/api";
 
 export default function UploadScreen() {
+  const { authState } = useAuth();
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [language, setLanguage] = useState("");
+  const [file, setFile] = useState<HandleUploadResponse | null>(null);
+  const [buttonLabel, setButtonLabel] = useState("Save book");
+
+  const handleUpload = async (data: HandleUploadResponse) => {
+    setFile(data);
+  };
+
+  const handleSaveBook = async () => {
+    if (!file) return;
+
+    setButtonLabel("Uploading you book to the cloud");
+    
+    await api.createBook({
+      title,
+      author,
+      language,
+      file,
+      name: file.name.split(".")[0],
+      userId: authState!.userData.id!,
+    });
+
+    setButtonLabel("Book uploaded");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -19,21 +50,13 @@ export default function UploadScreen() {
       </View>
 
       <View style={styles.metadataSection}>
-        <FileInput
-          title="Custom cover"
-          instruction="Select a .jpg or .png file"
-          fileTypes="image/*"
-        />
-
-        <View style={{ flex: 1, justifyContent: "space-between" }}>
-          <View style={{ gap: 8 }}>
-            <Input placeholder="Title" />
-            <Input placeholder="Author" />
-            <Input placeholder="Language" />
-          </View>
-
-          <Button label="Save book" />
+        <View style={{ gap: 8 }}>
+          <Input placeholder="Title" value={title} onChangeText={(text) => setTitle(text)} />
+          <Input placeholder="Author" value={author} onChangeText={(text) => setAuthor(text)} />
+          <Input placeholder="Language" value={language} onChangeText={(text) => setLanguage(text)} />
         </View>
+
+        <Button label={buttonLabel} onPress={handleSaveBook} />
       </View>
 
       <View style={{ width: "100%" }}>
@@ -41,6 +64,8 @@ export default function UploadScreen() {
           title="Upload your e-book"
           instruction="Select an .epub file"
           fileTypes="application/epub+zip"
+          value={file}
+          onChange={handleUpload}
         />
       </View>
     </View>
@@ -70,7 +95,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   metadataSection: {
-    flexDirection: "row",
     gap: 16,
+    width: "100%",
   },
 });

@@ -9,19 +9,21 @@ type RegisterInput = {
   fullname: string;
 }
 
+type UserData = {
+  id: string;
+  email: string;
+  fullname: string;
+  username: string;
+}
+
 type AuthenticationData = {
   token: string | null;
   authenticated: boolean | null;
-  userData?: {
-    id: string;
-    email: string;
-    fullname: string;
-    username: string;
-  };
+  userData: UserData | Record<string, never>;
 }
 
 interface AuthProps {
-  authState?: { token: string | null; authenticated: boolean | null };
+  authState?: { token: string | null; authenticated: boolean | null, userData:  UserData | Record<string, never> };
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
   onRegister?: (input: RegisterInput) => Promise<any>;
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
@@ -42,11 +44,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authState, setAuthState] = useState<AuthenticationData>({
     token: null,
     authenticated: null,
+    userData: {},
   });
 
   useEffect(() => {
     const loadToken = async () => {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      const userData = await SecureStore.getItemAsync("userData");
 
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -54,6 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setAuthState({
           token,
           authenticated: true,
+          userData: JSON.parse(userData || "{}"),
         });
 
         return;
@@ -62,6 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setAuthState({
         token: null,
         authenticated: false,
+        userData: {},
       });
     };
 
@@ -119,6 +125,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAuthState({
       token: null,
       authenticated: false,
+      userData: {},
     });
   };
 

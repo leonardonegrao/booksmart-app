@@ -1,40 +1,48 @@
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import Text from "@/components/ui/text";
 import BookItem from "@/components/home/book";
 
-const startedBooks = [
-  {
-    id: "a-promised-land",
-    title: "A Promised Land",
-    author: "Barack Obama",
-    coverUrl: require("@/assets/images/books/a-promised-land.png"),
-    percentageRead: 46,
-  },
-  {
-    id: "blade-runner",
-    title: "Blade Runner",
-    author: "Philip K. Dick",
-    coverUrl: require("@/assets/images/books/blade-runner.png"),
-    percentageRead: 68,
-  },
-];
+import api from "@/services/api";
+import { useAuth } from "@/context/AuthContext";
+import { Book } from "@/@types/book";
 
 export default function HomeScreen() {
+  const { authState } = useAuth(); 
+  const [books, setBooks] = useState<Book[]>([]);
+
+  const getBooks = async () => {
+    try {
+      if (authState?.userData.id) {
+        const result = await api.getBooks(authState!.userData.id);
+        setBooks(result);
+      }
+
+      return [];
+    } catch (e) {
+      alert("An error occurred while trying to fetch the books");
+    }
+  };
+
+  useEffect(() => {
+    getBooks();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.section}>
         <Text fontType="serifBold" style={styles.title}>
-          Continue reading ({startedBooks.length})
+          Continue reading ({books.length})
         </Text>
 
         <View style={styles.booksList}>
-          {startedBooks.map(book => (
+          {books.map(book => (
             <BookItem
               key={book.id}
-              title={book.title}
-              coverUrl={book.coverUrl}
-              percentageRead={book.percentageRead}
+              title="User book"
+              coverUrl=""
+              percentageRead={0}
             />
           ))}
         </View>
