@@ -17,9 +17,10 @@ export default function HomeScreen() {
       if (authState?.userData.id) {
         const result = await api.getBooks(authState!.userData.id);
         setBooks(result);
+        return;
       }
 
-      return [];
+      setBooks([]);
     } catch (e) {
       alert("An error occurred while trying to fetch the books");
     }
@@ -40,9 +41,9 @@ export default function HomeScreen() {
           {books.map(book => (
             <BookItem
               key={book.id}
-              title="User book"
+              title={book.title}
               coverUrl=""
-              percentageRead={0}
+              percentageRead={book.percentageRead}
             />
           ))}
         </View>

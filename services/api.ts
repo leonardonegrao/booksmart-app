@@ -7,7 +7,7 @@ import { HandleUploadResponse } from "@/components/ui/file-input";
 const API_URL = "http://localhost:3333";
 
 async function getBooks(userId: string): Promise<Book[]> {
-  const response = await axios.get(`http://localhost:3000/books/${userId}`);
+  const response = await axios.get(`http://localhost:3333/books/${userId}`);
   return response.data;
 }
 
