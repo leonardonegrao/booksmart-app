@@ -1,4 +1,5 @@
 import { StyleSheet, View } from "react-native";
+import * as FileSystem from "expo-file-system";
 
 import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
@@ -6,7 +7,9 @@ import FileInput, { HandleUploadResponse } from "@/components/ui/file-input";
 import Text from "@/components/ui/text";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+
 import api from "@/services/api";
+import getMetadata from "@/utils/getMetadata";
 
 export default function UploadScreen() {
   const { authState } = useAuth();
@@ -14,10 +17,24 @@ export default function UploadScreen() {
   const [author, setAuthor] = useState("");
   const [language, setLanguage] = useState("");
   const [file, setFile] = useState<HandleUploadResponse | null>(null);
+  const [coverData, setCoverData] = useState<string>("");
   const [buttonLabel, setButtonLabel] = useState("Save book");
 
   const handleUpload = async (data: HandleUploadResponse) => {
     setFile(data);
+
+    const fileData = await FileSystem.readAsStringAsync(data.uri, { encoding: "base64" });
+
+    const { metadata, coverImageData } = await getMetadata(fileData);
+    
+    if (metadata.title)
+      setTitle(metadata.title);
+    if (metadata.author)
+      setAuthor(metadata.author);
+    if (metadata.language)
+      setLanguage(metadata.language);
+    if (coverImageData)
+      setCoverData(coverImageData);
   };
 
   const handleSaveBook = async () => {
