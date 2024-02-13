@@ -113,7 +113,7 @@ async function getCoverImageData(coverImagePath: string, opfPath: string, zip: J
     throw new Error("Cover image file could not be found.");
   }
 
-  const coverImageData = await coverImageFile.async("base64");
+  const coverImageData = await coverImageFile.async("blob");
   return coverImageData;
 }
 

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import * as FileSystem from "expo-file-system";
 
@@ -5,7 +6,6 @@ import Button from "@/components/ui/button";
 import Input from "@/components/ui/input";
 import FileInput, { HandleUploadResponse } from "@/components/ui/file-input";
 import Text from "@/components/ui/text";
-import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 import api from "@/services/api";
@@ -13,14 +13,18 @@ import getMetadata from "@/utils/getMetadata";
 
 export default function UploadScreen() {
   const { authState } = useAuth();
+
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [language, setLanguage] = useState("");
   const [file, setFile] = useState<HandleUploadResponse | null>(null);
-  const [coverData, setCoverData] = useState<string>("");
-  const [buttonLabel, setButtonLabel] = useState("Save book");
+  const [coverData, setCoverData] = useState<Blob | null>(null);
+
+  const [buttonLabel, setButtonLabel] = useState("Upload book");
 
   const handleUpload = async (data: HandleUploadResponse) => {
+    setButtonLabel("Loading data, please wait");
+
     setFile(data);
 
     const fileData = await FileSystem.readAsStringAsync(data.uri, { encoding: "base64" });
@@ -35,18 +39,21 @@ export default function UploadScreen() {
       setLanguage(metadata.language);
     if (coverImageData)
       setCoverData(coverImageData);
+
+    setButtonLabel("Upload book");
   };
 
   const handleSaveBook = async () => {
     if (!file) return;
 
-    setButtonLabel("Uploading you book to the cloud");
+    setButtonLabel("Uploading you book to the cloud, this may take a while");
     
     await api.createBook({
       title,
       author,
       language,
       file,
+      coverData: coverData!,
       name: file.name.split(".")[0],
       userId: authState!.userData.id!,
     });
@@ -62,7 +69,7 @@ export default function UploadScreen() {
         </Text>
 
         <Text fontType="sansRegular" style={styles.pageSubtitle}>
-          Once your file is uploaded, you can edit the metadata if you need
+          Once your file is loaded, you can edit the metadata if you need
         </Text>
       </View>
 
@@ -78,8 +85,8 @@ export default function UploadScreen() {
 
       <View style={{ width: "100%" }}>
         <FileInput
-          title="Upload your e-book"
-          instruction="Select an .epub file"
+          title={file ? file.name : "Upload your book"}
+          instruction={file ? "Your file is ready" : "Select your .epub file"}
           fileTypes="application/epub+zip"
           value={file}
           onChange={handleUpload}

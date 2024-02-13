@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import * as FileSystem from "expo-file-system";
 
 import { Book } from "@/@types/book";
@@ -18,6 +18,19 @@ interface CreateBookInput {
   author: string;
   language: string;
   file: HandleUploadResponse;
+  coverData: Blob;
+}
+
+interface CreateBookAPIResponse {
+  id: string;
+  filename: string;
+  userId: string;
+  bookUrl: string;
+  coverUrl: string;
+  title: string;
+  author: string;
+  percentageRead: number;
+  language: string;
 }
 
 async function createBook(input: CreateBookInput): Promise<void> {  
@@ -27,21 +40,39 @@ async function createBook(input: CreateBookInput): Promise<void> {
   };
 
   try {
-    const apiResponse = await axios.post(`${API_URL}/books/upload`, data);
+    const apiResponse: AxiosResponse<CreateBookAPIResponse> = await axios.post(`${API_URL}/books/upload`, data);
 
     if (apiResponse.status !== 201) {
       throw new Error("Failed to upload book");
     }
 
-    const bucketResponse = await FileSystem.uploadAsync(apiResponse.data.url, input.file.uri, {
-      fieldName: "file",
-      httpMethod: "PUT",
-    });
+    const bookUploadURL = apiResponse.data.bookUrl;
+    const bookLocalURI = input.file.uri;
+    const uploadOptions: FileSystem.FileSystemUploadOptions = { fieldName: "file", httpMethod: "PUT" };
 
-    if (bucketResponse.status !== 200) {
+    const uploadBookFileResponse = await FileSystem.uploadAsync(bookUploadURL, bookLocalURI, uploadOptions);
+
+    if (uploadBookFileResponse.status !== 200) {
       throw new Error("Failed to upload book");
     }
-  } catch (e) {
+
+    const coverUploadURL = apiResponse.data.coverUrl;
+    const coverBlob = input.coverData;
+    const coverFile = new File([coverBlob], `${input.name}-cover.png`, { type: "image/png" });
+    const formData = new FormData();
+    formData.append("file", coverFile);
+
+    const uploadCoverImageResponse = await fetch(coverUploadURL, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (uploadCoverImageResponse.status !== 200) {
+      throw new Error("Failed to upload cover image");
+    }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
     alert("An error ocurred while uploading the book");
   }
 }
