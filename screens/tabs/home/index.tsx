@@ -42,7 +42,7 @@ export default function HomeScreen() {
             <BookItem
               key={book.id}
               title={book.title}
-              coverUrl=""
+              coverUrl={book.coverUrl!}
               percentageRead={book.percentageRead}
             />
           ))}
