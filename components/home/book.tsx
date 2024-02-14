@@ -1,19 +1,22 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
+import {  useState } from "react";
+import { Asset } from "expo-asset";
 
 interface BookItemProps {
   percentageRead: number
   title: string
   coverKey: string
+  coverUri: string
 }
 
-export default function BookItem({ title, coverKey, percentageRead }: BookItemProps) {
-  console.log(coverKey);
+export default function BookItem({ title, coverKey, coverUri, percentageRead }: BookItemProps) {
+  const imageURI = Asset.fromModule(coverUri).uri;
 
   return (
     <View style={styles.container}>
       <Image
-        source={coverKey}
+        source={imageURI}
         style={styles.cover}
       />
 
