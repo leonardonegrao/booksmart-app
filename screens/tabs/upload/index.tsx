@@ -48,7 +48,7 @@ export default function UploadScreen() {
 
     setButtonLabel("Uploading you book to the cloud, this may take a while");
     
-    await api.createBook({
+    const response = await api.createBook({
       title,
       author,
       language,
@@ -57,6 +57,11 @@ export default function UploadScreen() {
       name: file.name.split(".")[0],
       userId: authState!.userData.id!,
     });
+
+    if (response.status === "error") {
+      alert("An error occurred while trying to upload your book");
+      return;
+    }
 
     setButtonLabel("Book uploaded");
   };

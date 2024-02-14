@@ -2,7 +2,8 @@ export interface Book {
   id: string;
   userId: string;
   filename: string;
-  url: string;
+  bookUrl: string;
+  bookLocalUri: string;
   percentageRead: number;
   title: string;
   author: string;
