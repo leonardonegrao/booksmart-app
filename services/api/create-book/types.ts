@@ -23,8 +23,10 @@ export interface CreateBookAPIResponse {
   id: string;
   filename: string;
   userId: string;
-  bookUrl: string;
-  coverUrl: string;
+  bookSignedUrl: string;
+  bookBucketKey: string;
+  coverSignedUrl: string;
+  coverBucketKey: string;
   title: string;
   author: string;
   percentageRead: number;

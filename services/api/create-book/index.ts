@@ -15,8 +15,8 @@ const createBook = async (input: CreateBookInput): Promise<CreateBookResponse> =
     const apiResponseData = await createBookAPIRequest(data);
     await createBookLocalDb({ ...apiResponseData, bookLocalUri: input.file.uri }, dbInstance);
 
-    await uploadBookFile(apiResponseData.bookUrl, input.file.uri);
-    await uploadBookCover(apiResponseData.coverUrl, input.coverData, input.name);
+    await uploadBookFile(apiResponseData.bookSignedUrl, input.file.uri);
+    await uploadBookCover(apiResponseData.coverSignedUrl, input.coverData, input.name);
 
     return response;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -12,10 +12,24 @@ const openDatabase = () => {
   return db;
 };
 
+const dropBookTable = (db: SQLiteDatabase) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      "DROP TABLE IF EXISTS books;",
+      [],
+      () => console.log("Table dropped successfully"),
+      (error) => {
+        console.error("Error dropping table", error);
+        return false;
+      },
+    );
+  });
+};
+
 const createBookTable = (db: SQLiteDatabase) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS books (id TEXT, filename TEXT, userID TEXT, bookUrl TEXT, bookLocalUri TEXT, coverUrl TEXT, title TEXT, author TEXT, percentageRead INTEGER, language TEXT);",
+      "CREATE TABLE IF NOT EXISTS books (id TEXT, filename TEXT, userID TEXT, bookBucketKey TEXT, bookLocalUri TEXT, coverBucketKey TEXT, title TEXT, author TEXT, percentageRead INTEGER, language TEXT);",
     [],
     () => console.log("Table created successfully"),
     (error) => {
@@ -29,14 +43,14 @@ const createBookTable = (db: SQLiteDatabase) => {
 const insertBook = (db: SQLiteDatabase, bookData: InsertBookInput) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "INSERT INTO books (id, filename, userId, bookUrl, bookLocalUri, coverUrl, title, author, percentageRead, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+      "INSERT INTO books (id, filename, userId, bookBucketKey, bookLocalUri, coverBucketKey, title, author, percentageRead, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
       [
         bookData.id,
         bookData.filename,
         bookData.userId,
-        bookData.bookUrl,
+        bookData.bookBucketKey,
         bookData.bookLocalUri,
-        bookData.coverUrl,
+        bookData.coverBucketKey,
         bookData.title,
         bookData.author,
         bookData.percentageRead,

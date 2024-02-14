@@ -2,11 +2,11 @@ export interface Book {
   id: string;
   userId: string;
   filename: string;
-  bookUrl: string;
+  bookBucketKey: string;
   bookLocalUri: string;
   percentageRead: number;
   title: string;
   author: string;
-  coverUrl?: string;
+  bookCoverKey?: string;
   language: "en" | "es" | "fr" | "de" | "it" | "pt";
 }
