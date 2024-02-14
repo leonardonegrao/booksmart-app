@@ -4,14 +4,16 @@ import { Image } from "expo-image";
 interface BookItemProps {
   percentageRead: number
   title: string
-  coverUrl: string
+  coverKey: string
 }
 
-export default function BookItem({ title, coverUrl, percentageRead }: BookItemProps) {
+export default function BookItem({ title, coverKey, percentageRead }: BookItemProps) {
+  console.log(coverKey);
+
   return (
     <View style={styles.container}>
       <Image
-        source={coverUrl}
+        source={coverKey}
         style={styles.cover}
       />
 
