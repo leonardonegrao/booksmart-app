@@ -1,39 +1,52 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
-import {  useState } from "react";
 import { Asset } from "expo-asset";
+import { Link } from "expo-router";
 
 interface BookItemProps {
-  percentageRead: number
-  title: string
-  coverKey: string
-  coverUri: string
+  bookId: string;
+  percentageRead: number;
+  title: string;
+  coverKey: string;
+  coverUri: string;
 }
 
-export default function BookItem({ title, coverKey, coverUri, percentageRead }: BookItemProps) {
+export default function BookItem({
+  bookId,
+  title,
+  coverKey,
+  coverUri,
+  percentageRead,
+}: BookItemProps) {
   const imageURI = Asset.fromModule(coverUri).uri;
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={imageURI}
-        style={styles.cover}
-      />
+    <Link
+      href={{
+        pathname: "/reader/[id]",
+        params: { id: bookId },
+      }}
+    >
+      <View style={styles.container}>
+        <Image source={imageURI} style={styles.cover} />
 
-      <Text style={styles.title}>
-        {title}
-      </Text>
+        <Text style={styles.title}>{title}</Text>
 
-      <View style={{ backgroundColor: "transparent", gap: 4, alignItems: "flex-end" }}>
-        <View style={styles.progressBackground}>
-          <View style={{ ...styles.progress, width: `${percentageRead}%` }} />
+        <View
+          style={{
+            backgroundColor: "transparent",
+            gap: 4,
+            alignItems: "flex-end",
+          }}
+        >
+          <View style={styles.progressBackground}>
+            <View style={{ ...styles.progress, width: `${percentageRead}%` }} />
+          </View>
+
+          <Text style={styles.progressLabel}>{percentageRead}% read</Text>
         </View>
-
-        <Text style={styles.progressLabel}>
-          {percentageRead}% read
-        </Text>
       </View>
-    </View>
+    </Link>
   );
 }
 

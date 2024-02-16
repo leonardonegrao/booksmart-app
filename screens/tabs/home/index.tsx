@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Book } from "@/@types/book";
 
 export default function HomeScreen() {
-  const { authState } = useAuth(); 
+  const { authState } = useAuth();
   const [books, setBooks] = useState<Book[]>([]);
 
   const getBooks = async () => {
@@ -38,9 +38,10 @@ export default function HomeScreen() {
         </Text>
 
         <View style={styles.booksList}>
-          {books.map(book => (
+          {books.map((book) => (
             <BookItem
               key={book.id}
+              bookId={book.id}
               title={book.title}
               coverKey={book.coverBucketKey!}
               coverUri={book.coverLocalUri!}
@@ -48,7 +49,7 @@ export default function HomeScreen() {
             />
           ))}
         </View>
-      </View>  
+      </View>
     </View>
   );
 }

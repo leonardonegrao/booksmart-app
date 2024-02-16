@@ -89,9 +89,30 @@ const getBooks = (db: SQLiteDatabase, userId: string) => {
   });
 };
 
+const getBook = (bookId: string) => {
+  const db = openDatabase();
+
+  return new Promise<Book>((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM books WHERE id = ?;",
+        [bookId],
+        (_, { rows }) => {
+          resolve(rows.item(0));
+        },
+        (error) => {
+          console.error("Error getting book", error);
+          return false;
+        },
+      );
+    });
+  });
+};
+
 export default {
   openDatabase,
   createBookTable,
   insertBook,
   getBooks,
+  getBook,
 };
