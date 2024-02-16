@@ -8,6 +8,7 @@ export interface CreateBookInput {
   language: string;
   file: HandleUploadResponse;
   coverData: Blob;
+  coverLocalPath: string;
 }
 
 export interface CreateBookResponse {

@@ -133,10 +133,20 @@ const EyeOpen = (props: SvgProps) => (
 </Svg>
 );
 
+const ChevronLeft = (props: SvgProps) => (
+  <Svg width={props.fontSize || 24} height={props.fontSize || 24} viewBox="0 0 24 24" fill="none" {...props}>
+    <Path
+      d="M15 6C15 6 9.00001 10.4189 9 12C8.99999 13.5812 15 18 15 18"
+      stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 const ChevronRight = (props: SvgProps) => (
   <Svg
-    width={16}
-    height={16}
+    width={props.fontSize || 16}
+    height={props.fontSize || 16}
+    viewBox="0 0 24 24"
     fill="none"
     {...props}
   >
@@ -150,6 +160,25 @@ const ChevronRight = (props: SvgProps) => (
   </Svg>
 );
 
+const BrainIcon = (props: SvgProps) => (
+  <Svg width={props.fontSize || 24} height={props.fontSize || 24} viewBox="0 0 25 24" fill="none" {...props}>
+    <Path
+      d="M7.5 4.5C5.84315 4.5 4.5 5.84315 4.5 7.5C4.5 8.06866 4.65822 8.60037 4.93304 9.0535C3.54727 9.31855 2.5 10.537 2.5 12C2.5 13.463 3.54727 14.6814 4.93304 14.9465M7.5 4.5C7.5 3.11929 8.61929 2 10 2C11.3807 2 12.5 3.11929 12.5 4.5V19.5C12.5 20.8807 11.3807 22 10 22C8.61929 22 7.5 20.8807 7.5 19.5C5.84315 19.5 4.5 18.1569 4.5 16.5C4.5 15.9313 4.65822 15.3996 4.93304 14.9465M7.5 4.5C7.5 5.31791 7.89278 6.04408 8.5 6.50018M4.93304 14.9465C5.28948 14.3588 5.84207 13.9032 6.5 13.6707"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M17.5 19.5C19.1569 19.5 20.5 18.1569 20.5 16.5C20.5 15.9313 20.3418 15.3996 20.067 14.9465C21.4527 14.6814 22.5 13.463 22.5 12C22.5 10.537 21.4527 9.31855 20.067 9.0535M17.5 19.5C17.5 20.8807 16.3807 22 15 22C13.6193 22 12.5 20.8807 12.5 19.5V4.5C12.5 3.11929 13.6193 2 15 2C16.3807 2 17.5 3.11929 17.5 4.5C19.1569 4.5 20.5 5.84315 20.5 7.5C20.5 8.06866 20.3418 8.60037 20.067 9.0535M17.5 19.5C17.5 18.6821 17.1072 17.9559 16.5 17.4998M20.067 9.0535C19.7105 9.64121 19.1579 10.0967 18.5 10.3293"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 export {
   LibraryIcon,
   UploadBookIcon,
@@ -158,4 +187,6 @@ export {
   UploadSquare,
   EyeOpen,
   ChevronRight,
+  ChevronLeft,
+  BrainIcon,
 };

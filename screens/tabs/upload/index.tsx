@@ -19,6 +19,7 @@ export default function UploadScreen() {
   const [language, setLanguage] = useState("");
   const [file, setFile] = useState<HandleUploadResponse | null>(null);
   const [coverData, setCoverData] = useState<Blob | null>(null);
+  const [coverLocalPath, setCoverLocalPath] = useState<string | null>("");
 
   const [buttonLabel, setButtonLabel] = useState("Upload book");
 
@@ -29,7 +30,7 @@ export default function UploadScreen() {
 
     const fileData = await FileSystem.readAsStringAsync(data.uri, { encoding: "base64" });
 
-    const { metadata, coverImageData } = await getMetadata(fileData);
+    const { metadata, coverImageDataBlob, coverLocalPath } = await getMetadata(fileData);
     
     if (metadata.title)
       setTitle(metadata.title);
@@ -37,8 +38,10 @@ export default function UploadScreen() {
       setAuthor(metadata.author);
     if (metadata.language)
       setLanguage(metadata.language);
-    if (coverImageData)
-      setCoverData(coverImageData);
+    if (coverImageDataBlob)
+      setCoverData(coverImageDataBlob);
+    if (coverLocalPath)
+      setCoverLocalPath(coverLocalPath);
 
     setButtonLabel("Upload book");
   };
@@ -56,6 +59,7 @@ export default function UploadScreen() {
       coverData: coverData!,
       name: file.name.split(".")[0],
       userId: authState!.userData.id!,
+      coverLocalPath: coverLocalPath!,
     });
 
     if (response.status === "error") {

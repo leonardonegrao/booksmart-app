@@ -13,7 +13,13 @@ const createBook = async (input: CreateBookInput): Promise<CreateBookResponse> =
 
   try {
     const apiResponseData = await createBookAPIRequest(data);
-    await createBookLocalDb({ ...apiResponseData, bookLocalUri: input.file.uri }, dbInstance);
+    await createBookLocalDb({
+        ...apiResponseData,
+        bookLocalUri: input.file.uri,
+        coverLocalUri: input.coverLocalPath,
+      },
+      dbInstance
+    );
 
     await uploadBookFile(apiResponseData.bookSignedUrl, input.file.uri);
     await uploadBookCover(apiResponseData.coverSignedUrl, input.coverData, input.name);

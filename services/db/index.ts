@@ -5,6 +5,7 @@ import { Book } from "@/@types/book";
 
 export interface InsertBookInput extends CreateBookAPIResponse {
   bookLocalUri: string;
+  coverLocalUri: string;
 }
 
 const openDatabase = () => {
@@ -29,7 +30,7 @@ const dropBookTable = (db: SQLiteDatabase) => {
 const createBookTable = (db: SQLiteDatabase) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS books (id TEXT, filename TEXT, userID TEXT, bookBucketKey TEXT, bookLocalUri TEXT, coverBucketKey TEXT, title TEXT, author TEXT, percentageRead INTEGER, language TEXT);",
+      "CREATE TABLE IF NOT EXISTS books (id TEXT, filename TEXT, userID TEXT, bookBucketKey TEXT, bookLocalUri TEXT, coverBucketKey TEXT, coverLocalUri TEXT, title TEXT, author TEXT, percentageRead INTEGER, language TEXT);",
     [],
     () => console.log("Table created successfully"),
     (error) => {
@@ -43,7 +44,7 @@ const createBookTable = (db: SQLiteDatabase) => {
 const insertBook = (db: SQLiteDatabase, bookData: InsertBookInput) => {
   db.transaction((tx) => {
     tx.executeSql(
-      "INSERT INTO books (id, filename, userId, bookBucketKey, bookLocalUri, coverBucketKey, title, author, percentageRead, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+      "INSERT INTO books (id, filename, userId, bookBucketKey, bookLocalUri, coverBucketKey, coverLocalUri, title, author, percentageRead, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
       [
         bookData.id,
         bookData.filename,
@@ -51,6 +52,7 @@ const insertBook = (db: SQLiteDatabase, bookData: InsertBookInput) => {
         bookData.bookBucketKey,
         bookData.bookLocalUri,
         bookData.coverBucketKey,
+        bookData.coverLocalUri,
         bookData.title,
         bookData.author,
         bookData.percentageRead,
@@ -87,9 +89,30 @@ const getBooks = (db: SQLiteDatabase, userId: string) => {
   });
 };
 
+const getBook = (bookId: string) => {
+  const db = openDatabase();
+
+  return new Promise<Book>((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM books WHERE id = ?;",
+        [bookId],
+        (_, { rows }) => {
+          resolve(rows.item(0));
+        },
+        (error) => {
+          console.error("Error getting book", error);
+          return false;
+        },
+      );
+    });
+  });
+};
+
 export default {
   openDatabase,
   createBookTable,
   insertBook,
   getBooks,
+  getBook,
 };

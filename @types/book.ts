@@ -7,6 +7,7 @@ export interface Book {
   percentageRead: number;
   title: string;
   author: string;
-  bookCoverKey?: string;
+  coverBucketKey?: string;
+  coverLocalUri: string;
   language: "en" | "es" | "fr" | "de" | "it" | "pt";
 }

@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { DOMParser } from "@xmldom/xmldom";
+import * as FileSystem from "expo-file-system";
 
 const zipObj = new JSZip();
 
@@ -113,8 +114,20 @@ async function getCoverImageData(coverImagePath: string, opfPath: string, zip: J
     throw new Error("Cover image file could not be found.");
   }
 
-  const coverImageData = await coverImageFile.async("blob");
-  return coverImageData;
+  const coverImageDataBlob = await coverImageFile.async("blob");
+  const coverImageDataBase64 = await coverImageFile.async("base64");
+
+  return { coverImageDataBlob, coverImageDataBase64 };
+}
+
+async function saveImageLocally(coverData: string, name: string) {
+  await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + "covers", { intermediates: true });
+
+  const coverPath = `${FileSystem.documentDirectory}covers/${name}-cover.png`;
+
+  await FileSystem.writeAsStringAsync(coverPath, coverData, { encoding: FileSystem.EncodingType.Base64 });
+
+  return coverPath;
 }
 
 export default async function getMetadata(fileData: string) {
@@ -127,11 +140,14 @@ export default async function getMetadata(fileData: string) {
 
   const { metadata, coverImagePath } = await getMetadataFromOpf(opfFile);
 
-  const coverImageData = await getCoverImageData(coverImagePath, opfPath, zip);
+  const { coverImageDataBlob, coverImageDataBase64 } = await getCoverImageData(coverImagePath, opfPath, zip);
+
+  const coverLocalPath = await saveImageLocally(coverImageDataBase64, metadata.title!);
 
   return {
     metadata,
     coverImagePath,
-    coverImageData,
+    coverImageDataBlob,
+    coverLocalPath,
   };
 }
