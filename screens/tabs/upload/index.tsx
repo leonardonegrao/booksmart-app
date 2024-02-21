@@ -63,7 +63,7 @@ export default function UploadScreen() {
     });
 
     if (response.status === "error") {
-      alert("An error occurred while trying to upload your book");
+      alert(`An error occurred while trying to upload your book: ${response.message}`, );
       return;
     }
 

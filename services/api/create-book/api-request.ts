@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { CreateBookAPIRequestInput, CreateBookAPIResponse } from "./types";
 
-const API_URL = "http://localhost:3333";
+const API_URL = "http://192.168.1.206:3333";
 
 // Book Upload Step 1: Send book data to server
 // Returns the data stored in the database

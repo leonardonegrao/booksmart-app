@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
-import { ReaderProvider } from "@epubjs-react-native/core";
+import { ReaderProvider } from "@/lib/custom-reader";
 
 import ReaderContainer from "@/components/reader/reader-container";
 import db from "@/services/db";

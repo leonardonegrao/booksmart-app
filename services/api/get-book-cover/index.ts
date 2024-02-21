@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3333";
+const API_URL = "http://192.168.1.206:3333";
 
 async function getBookCover(key: string): Promise<string> {
   const response = await axios.get(`${API_URL}/books/covers/${key}`);
