@@ -7,6 +7,7 @@ export interface CreateBookInput {
   author: string;
   language: string;
   file: HandleUploadResponse;
+  folder: string;
   coverData: Blob;
   coverLocalPath: string;
 }
@@ -18,6 +19,7 @@ export interface CreateBookResponse {
 
 export interface CreateBookAPIRequestInput extends CreateBookInput {
   percentageRead: number;
+  lastLocation: string;
 }
 
 export interface CreateBookAPIResponse {
@@ -31,5 +33,6 @@ export interface CreateBookAPIResponse {
   title: string;
   author: string;
   percentageRead: number;
+  lastLocation: string;
   language: string;
 }

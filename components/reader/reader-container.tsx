@@ -31,8 +31,7 @@ export default function ReaderContainer({ bookUri, title, author }: ReaderContai
   const handleLocationChange = (cfi: string) => {
     console.log(cfi);
 
-    // store on state
-    // when user leaves the reader, store the last location on DB
+    // store on local DB
   };
 
   return (

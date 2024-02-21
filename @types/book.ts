@@ -4,7 +4,9 @@ export interface Book {
   filename: string;
   bookBucketKey: string;
   bookLocalUri: string;
+  epubLocalUri: string;
   percentageRead: number;
+  lastLocation: string;
   title: string;
   author: string;
   coverBucketKey?: string;

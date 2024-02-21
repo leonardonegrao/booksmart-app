@@ -7,7 +7,7 @@ import uploadBookCover from "./book-cover-upload";
 import db from "@/services/db";
 
 const createBook = async (input: CreateBookInput): Promise<CreateBookResponse> => {
-  const data = { ...input, percentageRead: 0 };
+  const data = { ...input, percentageRead: 0, lastLocation: "" };
   const dbInstance: SQLiteDatabase = await db.openDatabase();
   const response: CreateBookResponse = { status: "success", message: "Book created successfully" };
 
@@ -15,7 +15,8 @@ const createBook = async (input: CreateBookInput): Promise<CreateBookResponse> =
     const apiResponseData = await createBookAPIRequest(data);
     await createBookLocalDb({
         ...apiResponseData,
-        bookLocalUri: input.file.uri,
+        bookLocalUri: input.folder,
+        epubLocalUri: input.file.uri,
         coverLocalUri: input.coverLocalPath,
       },
       dbInstance

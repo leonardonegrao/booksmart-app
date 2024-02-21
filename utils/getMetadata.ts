@@ -130,8 +130,54 @@ async function saveImageLocally(coverData: string, name: string) {
   return coverPath;
 }
 
-export default async function getMetadata(fileData: string) {
+async function saveContentLocally(zip: JSZip, fileName: string) {
+  const folderUri = FileSystem.documentDirectory + "books/" + fileName;
+  await FileSystem.makeDirectoryAsync(folderUri, { intermediates: true });
+
+  try {
+    await Promise.all(
+      Object.keys(zip.files).map(async (filename) => {
+        if (zip.files[filename].dir) {
+          const newDir = folderUri + "/" + filename;
+          await FileSystem.makeDirectoryAsync(newDir, { intermediates: true });
+        }
+
+        if (!zip.files[filename].dir) {
+          const fileContent = await zip.file(filename)?.async("base64");
+  
+          if (fileContent) {
+            const filePath = folderUri + "/" + filename;
+            await FileSystem.writeAsStringAsync(
+              filePath,
+              fileContent,
+              { encoding: FileSystem.EncodingType.Base64 }
+            );
+          }
+        }
+      })
+    );
+  } catch (error) {
+    throw new Error("Error creating folders and files locally");
+  }
+
+  return folderUri;
+}
+
+function formatFileName(fileName: string) {
+  let formattedString = fileName.replace(/ /g, " ");
+
+  formattedString = formattedString.toLowerCase();
+  formattedString = formattedString.replace(/\.epub$/, "");
+
+  const randomValue = Math.random().toString(16).slice(2, 10);
+  formattedString = `${formattedString}_${randomValue}`;
+
+  return formattedString;
+}
+
+export default async function getMetadata(fileData: string, fileName: string) {
   const zip = await zipObj.loadAsync(fileData, { base64: true });
+  const folderUri = await saveContentLocally(zip, formatFileName(fileName));
 
   const containerXml = await getContainerXml(zip);
 
@@ -149,5 +195,6 @@ export default async function getMetadata(fileData: string) {
     coverImagePath,
     coverImageDataBlob,
     coverLocalPath,
+    folderUri,
   };
 }
