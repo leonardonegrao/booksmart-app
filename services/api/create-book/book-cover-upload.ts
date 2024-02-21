@@ -1,16 +1,15 @@
-const uploadBookCover = async (destinationUrl: string, blob: Blob, name: string) => {
-  const file = new File([blob], `${name}-cover.png`, { type: "image/png" });
-  const formData = new FormData();
-  formData.append("file", file);
+import * as FileSystem from "expo-file-system";
+import type { FileSystemUploadOptions } from "expo-file-system";
 
-  const uploadCoverImageResponse = await fetch(destinationUrl, {
-    method: "PUT",
-    body: formData,
-  });
+const uploadBookCover = async (destinationUrl: string, sourceUrl: string) => {
+  const uploadOptions: FileSystemUploadOptions = { fieldName: "file", httpMethod: "PUT" };
+  const uploadResponse = await FileSystem.uploadAsync(destinationUrl, sourceUrl, uploadOptions);
 
-  if (!uploadCoverImageResponse.ok) {
-    throw new Error(`Failed to upload book cover ${uploadCoverImageResponse.status.toString()}`);
+  if (uploadResponse.status !== 200) {
+    throw new Error(`Failed to upload book file to destination ${uploadResponse.status.toString()}`);
   }
+
+  return uploadResponse;
 };
 
 export default uploadBookCover;

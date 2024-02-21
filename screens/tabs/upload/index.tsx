@@ -18,7 +18,7 @@ export default function UploadScreen() {
   const [author, setAuthor] = useState("");
   const [language, setLanguage] = useState("");
   const [file, setFile] = useState<HandleUploadResponse | null>(null);
-  const [coverData, setCoverData] = useState<Blob | null>(null);
+  const [folder, setFolder] = useState("");
   const [coverLocalPath, setCoverLocalPath] = useState<string | null>("");
 
   const [buttonLabel, setButtonLabel] = useState("Upload book");
@@ -30,7 +30,7 @@ export default function UploadScreen() {
 
     const fileData = await FileSystem.readAsStringAsync(data.uri, { encoding: "base64" });
 
-    const { metadata, coverImageDataBlob, coverLocalPath } = await getMetadata(fileData);
+    const { metadata, coverLocalPath, opfUri } = await getMetadata(fileData, data.name);
     
     if (metadata.title)
       setTitle(metadata.title);
@@ -38,10 +38,10 @@ export default function UploadScreen() {
       setAuthor(metadata.author);
     if (metadata.language)
       setLanguage(metadata.language);
-    if (coverImageDataBlob)
-      setCoverData(coverImageDataBlob);
     if (coverLocalPath)
       setCoverLocalPath(coverLocalPath);
+    if (opfUri)
+      setFolder(opfUri); // TODO: save here the actual folderUri, and add new logic to save the opfUri
 
     setButtonLabel("Upload book");
   };
@@ -56,10 +56,10 @@ export default function UploadScreen() {
       author,
       language,
       file,
-      coverData: coverData!,
       name: file.name.split(".")[0],
       userId: authState!.userData.id!,
       coverLocalPath: coverLocalPath!,
+      folder,
     });
 
     if (response.status === "error") {

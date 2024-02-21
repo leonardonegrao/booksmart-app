@@ -5,6 +5,8 @@ import { Book } from "@/@types/book";
 
 export interface InsertBookInput extends CreateBookAPIResponse {
   bookLocalUri: string;
+  epubLocalUri: string;
+  lastLocation: string;
   coverLocalUri: string;
 }
 
@@ -14,61 +16,125 @@ const openDatabase = () => {
 };
 
 const dropBookTable = (db: SQLiteDatabase) => {
+  let transactionResult: null | "success" | "error" = null;
+
   db.transaction((tx) => {
     tx.executeSql(
       "DROP TABLE IF EXISTS books;",
       [],
-      () => console.log("Table dropped successfully"),
-      (error) => {
-        console.error("Error dropping table", error);
+      () => transactionResult = "success" as const,
+      () => {
+        transactionResult = "error" as const;
         return false;
       },
     );
   });
+
+  return transactionResult;
 };
 
 const createBookTable = (db: SQLiteDatabase) => {
+  let transactionResult: null | "success" | "error" = null;
+
   db.transaction((tx) => {
     tx.executeSql(
-      "CREATE TABLE IF NOT EXISTS books (id TEXT, filename TEXT, userID TEXT, bookBucketKey TEXT, bookLocalUri TEXT, coverBucketKey TEXT, coverLocalUri TEXT, title TEXT, author TEXT, percentageRead INTEGER, language TEXT);",
+      `
+        CREATE TABLE IF NOT EXISTS books
+        (
+          id TEXT,
+          filename TEXT,
+          userId TEXT,
+          bookBucketKey TEXT,
+          bookLocalUri TEXT,
+          epubLocalUri TEXT,
+          coverBucketKey TEXT,
+          coverLocalUri TEXT,
+          title TEXT,
+          author TEXT,
+          percentageRead INTEGER,
+          lastLocation TEXT,
+          language TEXT
+        );`,
     [],
-    () => console.log("Table created successfully"),
-    (error) => {
-      console.error("Error creating table", error);
+    () => transactionResult = "success" as const,
+    () => {
+      transactionResult = "error" as const;
       return false;
     },
     );
   });
+
+  return transactionResult;
 };
 
 const insertBook = (db: SQLiteDatabase, bookData: InsertBookInput) => {
+  let transactionResult: null | "success" | "error" = null;
+
   db.transaction((tx) => {
     tx.executeSql(
-      "INSERT INTO books (id, filename, userId, bookBucketKey, bookLocalUri, coverBucketKey, coverLocalUri, title, author, percentageRead, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+      `
+        INSERT INTO books
+        (
+          id,
+          filename,
+          userId,
+          bookBucketKey,
+          bookLocalUri,
+          epubLocalUri,
+          coverBucketKey,
+          coverLocalUri,
+          title,
+          author,
+          percentageRead,
+          lastLocation,
+          language
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
       [
         bookData.id,
         bookData.filename,
         bookData.userId,
         bookData.bookBucketKey,
         bookData.bookLocalUri,
+        bookData.epubLocalUri,
         bookData.coverBucketKey,
         bookData.coverLocalUri,
         bookData.title,
         bookData.author,
         bookData.percentageRead,
+        bookData.lastLocation,
         bookData.language,
       ],
-      () => console.log("Book inserted successfully"),
-      (error) => {
-        console.error("Error inserting book", error);
+      () => transactionResult = "success" as const,
+      () => {
+        transactionResult = "error" as const;
         return false;
       },
     );
   });
+
+  return transactionResult;
+};
+
+const updateBookProgress = (db: SQLiteDatabase, bookId: string, percentageRead: number, location: string) => {
+  let transactionResult: null | "success" | "error" = null;
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE books SET percentageRead = ?, lastLocation = ? WHERE id = ?;",
+      [percentageRead, location, bookId],
+      () => transactionResult = "success" as const,
+      () => {
+        transactionResult = "error" as const;
+        return false;
+      },
+    );
+  });
+
+  return transactionResult;
 };
 
 const getBooks = (db: SQLiteDatabase, userId: string) => {
-  return new Promise<Book[]>((resolve, reject) => {
+  return new Promise<Book[]>((resolve) => {
     db.transaction((tx) => {
       tx.executeSql(
         "SELECT * FROM books WHERE userId = ?;",
@@ -80,8 +146,7 @@ const getBooks = (db: SQLiteDatabase, userId: string) => {
           }
           resolve(books);
         },
-        (error) => {
-          console.error("Error getting books", error);
+        () => {
           return false;
         },
       );
@@ -92,7 +157,7 @@ const getBooks = (db: SQLiteDatabase, userId: string) => {
 const getBook = (bookId: string) => {
   const db = openDatabase();
 
-  return new Promise<Book>((resolve, reject) => {
+  return new Promise<Book>((resolve) => {
     db.transaction((tx) => {
       tx.executeSql(
         "SELECT * FROM books WHERE id = ?;",
@@ -100,8 +165,7 @@ const getBook = (bookId: string) => {
         (_, { rows }) => {
           resolve(rows.item(0));
         },
-        (error) => {
-          console.error("Error getting book", error);
+        () => {
           return false;
         },
       );
@@ -112,7 +176,9 @@ const getBook = (bookId: string) => {
 export default {
   openDatabase,
   createBookTable,
+  dropBookTable,
   insertBook,
   getBooks,
   getBook,
+  updateBookProgress,
 };
