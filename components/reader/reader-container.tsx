@@ -1,15 +1,20 @@
 import { ActivityIndicator, View, useWindowDimensions } from "react-native";
+import { router } from "expo-router";
 import { Reader, useReader } from "@/lib/custom-reader";
 import { useFileSystem } from "@epubjs-react-native/expo-file-system";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ReaderHeader from "./reader-header";
 import ReaderFooter from "./reader-footer";
+import api from "@/services/api";
+import { useEffect } from "react";
 
 interface ReaderContainerProps {
+  bookId: string;
   bookUri: string;
   title: string;
   author: string;
+  lastLocation: string;
 }
 
 function OpeningBookIndicator({ calculatedHeight }: { calculatedHeight: number }) {
@@ -18,7 +23,7 @@ function OpeningBookIndicator({ calculatedHeight }: { calculatedHeight: number }
   );
 }
 
-export default function ReaderContainer({ bookUri, title, author }: ReaderContainerProps) {
+export default function ReaderContainer({ bookId, lastLocation, bookUri, title, author }: ReaderContainerProps) {
   const { currentLocation, totalLocations, progress } = useReader();
 
   const { height, width } = useWindowDimensions();
@@ -28,15 +33,14 @@ export default function ReaderContainer({ bookUri, title, author }: ReaderContai
   const calculatedHeight = height - headerHeight - footerHeight - bottomInset - topInset - 80;
   const calculatedWidth = width - 80;
 
-  const handleLocationChange = (cfi: string) => {
-    console.log(cfi);
-
-    // store on local DB
+  const onBackPress = async () => {
+    await api.updateBookProgress(bookId, progress, currentLocation!.start.cfi);
+    router.navigate("/(tabs)/");
   };
 
   return (
     <View style={{ width: "100%" }}>
-      <ReaderHeader title={title} author={author} />
+      <ReaderHeader title={title} author={author} onBackPress={onBackPress} />
       {bookUri && (
         <View style={{ padding: 40 }}>
           <Reader
@@ -44,11 +48,9 @@ export default function ReaderContainer({ bookUri, title, author }: ReaderContai
             fileSystem={useFileSystem}
             height={calculatedHeight}
             width={calculatedWidth}
+            initialLocation={lastLocation}
             defaultTheme={defaultTheme}
             renderOpeningBookComponent={() => OpeningBookIndicator({ calculatedHeight })}
-            onSelected={() => { console.log("selected"); }}
-            onStarted={() => { console.log("started", bookUri); }}
-            onLocationChange={(_, curLocation) => handleLocationChange(curLocation.start.cfi)}
           />
         </View>
       )}

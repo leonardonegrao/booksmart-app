@@ -30,7 +30,7 @@ export default function UploadScreen() {
 
     const fileData = await FileSystem.readAsStringAsync(data.uri, { encoding: "base64" });
 
-    const { metadata, coverLocalPath, folderUri } = await getMetadata(fileData, data.name);
+    const { metadata, coverLocalPath, opfUri } = await getMetadata(fileData, data.name);
     
     if (metadata.title)
       setTitle(metadata.title);
@@ -40,8 +40,8 @@ export default function UploadScreen() {
       setLanguage(metadata.language);
     if (coverLocalPath)
       setCoverLocalPath(coverLocalPath);
-    if (folderUri)
-      setFolder(folderUri);
+    if (opfUri)
+      setFolder(opfUri); // TODO: save here the actual folderUri, and add new logic to save the opfUri
 
     setButtonLabel("Upload book");
   };

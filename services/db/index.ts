@@ -115,6 +115,24 @@ const insertBook = (db: SQLiteDatabase, bookData: InsertBookInput) => {
   return transactionResult;
 };
 
+const updateBookProgress = (db: SQLiteDatabase, bookId: string, percentageRead: number, location: string) => {
+  let transactionResult: null | "success" | "error" = null;
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      "UPDATE books SET percentageRead = ?, lastLocation = ? WHERE id = ?;",
+      [percentageRead, location, bookId],
+      () => transactionResult = "success" as const,
+      () => {
+        transactionResult = "error" as const;
+        return false;
+      },
+    );
+  });
+
+  return transactionResult;
+};
+
 const getBooks = (db: SQLiteDatabase, userId: string) => {
   return new Promise<Book[]>((resolve) => {
     db.transaction((tx) => {
@@ -162,4 +180,5 @@ export default {
   insertBook,
   getBooks,
   getBook,
+  updateBookProgress,
 };

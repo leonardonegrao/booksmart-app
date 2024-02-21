@@ -192,5 +192,6 @@ export default async function getMetadata(fileData: string, fileName: string) {
     coverImagePath,
     coverLocalPath,
     folderUri,
+    opfUri: folderUri + `/${opfPath}`,
   };
 }

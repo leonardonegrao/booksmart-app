@@ -9,6 +9,7 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
   const [bookUri, setBookUri] = useState<string>("");
   const [bookTitle, setBookTitle] = useState<string>("");
   const [bookAuthor, setBookAuthor] = useState<string>("");
+  const [lastLocation, setLastLocation] = useState<string>("");
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -22,6 +23,7 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
       setBookUri(bookResponse.bookLocalUri);
       setBookTitle(bookResponse.title);
       setBookAuthor(bookResponse.author);
+      setLastLocation(bookResponse.lastLocation);
     };
 
     fetchBook();
@@ -31,9 +33,11 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
     <SafeAreaView style={styles.container}>
       <ReaderProvider>
         <ReaderContainer
+          bookId={bookId}
           bookUri={bookUri}
           title={bookTitle}
           author={bookAuthor}
+          lastLocation={lastLocation}
         />
       </ReaderProvider>
     </SafeAreaView>

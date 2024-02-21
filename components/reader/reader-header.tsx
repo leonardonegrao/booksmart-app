@@ -2,21 +2,27 @@ import { StyleSheet, View } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { BrainIcon, ChevronLeft } from "../icons";
 import Text from "../ui/text";
-import { Link } from "expo-router";
 
 interface ReaderHeaderProps {
   title: string;
   author: string;
+  onBackPress?: () => Promise<void>;
 }
 
-export default function ReaderHeader({ title, author }: ReaderHeaderProps) {
+export default function ReaderHeader({ title, author, onBackPress }: ReaderHeaderProps) {
+  const handleBackPress = async () => {
+    if (onBackPress) {
+      await onBackPress();
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Link href="/(tabs)/">
+      <TouchableOpacity onPress={handleBackPress}>
         <View style={styles.headerButton}>
           <ChevronLeft fontSize={24} color="#939393" />
         </View>
-      </Link>
+      </TouchableOpacity>
 
       <View style={{ alignItems: "center" }}>
         <Text fontType="serifMedium" style={{ fontSize: 16 }}>
