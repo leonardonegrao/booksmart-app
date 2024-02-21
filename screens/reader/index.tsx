@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
+import { ReaderProvider } from "@/lib/custom-reader";
 
 import ReaderContainer from "@/components/reader/reader-container";
 import db from "@/services/db";
 
 export default function ReaderScreen({ bookId }: { bookId: string }) {
   const [bookUri, setBookUri] = useState<string>("");
+  const [bookTitle, setBookTitle] = useState<string>("");
+  const [bookAuthor, setBookAuthor] = useState<string>("");
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -17,6 +20,8 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
       }
 
       setBookUri(bookResponse.bookLocalUri);
+      setBookTitle(bookResponse.title);
+      setBookAuthor(bookResponse.author);
     };
 
     fetchBook();
@@ -24,9 +29,13 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ReaderContainer
-        bookUri={bookUri}
-      />
+      <ReaderProvider>
+        <ReaderContainer
+          bookUri={bookUri}
+          title={bookTitle}
+          author={bookAuthor}
+        />
+      </ReaderProvider>
     </SafeAreaView>
   );
 }

@@ -18,7 +18,7 @@ export default function ReaderHeader({ title, author }: ReaderHeaderProps) {
         </View>
       </Link>
 
-      <View>
+      <View style={{ alignItems: "center" }}>
         <Text fontType="serifMedium" style={{ fontSize: 16 }}>
           {title}
         </Text>
