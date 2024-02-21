@@ -10,7 +10,6 @@ import { useAuth } from "@/context/AuthContext";
 
 import api from "@/services/api";
 import getMetadata from "@/utils/getMetadata";
-import { getFunctionTime } from "@/utils/getFunctionTime";
 
 export default function UploadScreen() {
   const { authState } = useAuth();
@@ -19,7 +18,7 @@ export default function UploadScreen() {
   const [author, setAuthor] = useState("");
   const [language, setLanguage] = useState("");
   const [file, setFile] = useState<HandleUploadResponse | null>(null);
-  const [coverData, setCoverData] = useState<Blob | null>(null);
+  const [folder, setFolder] = useState("");
   const [coverLocalPath, setCoverLocalPath] = useState<string | null>("");
 
   const [buttonLabel, setButtonLabel] = useState("Upload book");
@@ -31,20 +30,18 @@ export default function UploadScreen() {
 
     const fileData = await FileSystem.readAsStringAsync(data.uri, { encoding: "base64" });
 
-    // const { metadata, coverImageDataBlob, coverLocalPath, folderUri } = await getMetadata(fileData, data.name);
-
-    await getFunctionTime(getMetadata, "getMetadata()", true, fileData, data.name);
+    const { metadata, coverLocalPath, folderUri } = await getMetadata(fileData, data.name);
     
-    // if (metadata.title)
-    //   setTitle(metadata.title);
-    // if (metadata.author)
-    //   setAuthor(metadata.author);
-    // if (metadata.language)
-    //   setLanguage(metadata.language);
-    // if (coverImageDataBlob)
-    //   setCoverData(coverImageDataBlob);
-    // if (coverLocalPath)
-    //   setCoverLocalPath(coverLocalPath);
+    if (metadata.title)
+      setTitle(metadata.title);
+    if (metadata.author)
+      setAuthor(metadata.author);
+    if (metadata.language)
+      setLanguage(metadata.language);
+    if (coverLocalPath)
+      setCoverLocalPath(coverLocalPath);
+    if (folderUri)
+      setFolder(folderUri);
 
     setButtonLabel("Upload book");
   };
@@ -59,11 +56,10 @@ export default function UploadScreen() {
       author,
       language,
       file,
-      coverData: coverData!,
       name: file.name.split(".")[0],
       userId: authState!.userData.id!,
       coverLocalPath: coverLocalPath!,
-      folder: "",
+      folder,
     });
 
     if (response.status === "error") {

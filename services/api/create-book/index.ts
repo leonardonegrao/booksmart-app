@@ -23,7 +23,7 @@ const createBook = async (input: CreateBookInput): Promise<CreateBookResponse> =
     );
 
     await uploadBookFile(apiResponseData.bookSignedUrl, input.file.uri);
-    await uploadBookCover(apiResponseData.coverSignedUrl, input.coverData, input.name);
+    await uploadBookCover(apiResponseData.coverSignedUrl, input.coverLocalPath);
 
     return response;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
