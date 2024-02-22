@@ -153,7 +153,8 @@ async function saveContentLocally(zip: JSZip, fileName: string) {
         }
       })
     );
-  } catch (error) {
+  } catch (error: any) {
+    console.error(error.message);
     throw new Error("Error creating folders and files locally");
   }
 
@@ -161,7 +162,7 @@ async function saveContentLocally(zip: JSZip, fileName: string) {
 }
 
 function formatFileName(fileName: string) {
-  let formattedString = fileName.replace(/ /g, " ");
+  let formattedString = fileName.replace(/ /g, "_");
 
   formattedString = formattedString.toLowerCase();
   formattedString = formattedString.replace(/\.epub$/, "");
@@ -173,25 +174,29 @@ function formatFileName(fileName: string) {
 }
 
 export default async function getMetadata(fileData: string, fileName: string) {
-  const zip = await zipObj.loadAsync(fileData, { base64: true });
-  const folderUri = await saveContentLocally(zip, formatFileName(fileName));
+  try {
+    const zip = await zipObj.loadAsync(fileData, { base64: true });
+    const folderUri = await saveContentLocally(zip, formatFileName(fileName));
 
-  const containerXml = await getContainerXml(folderUri);
+    const containerXml = await getContainerXml(folderUri);
 
-  const opfPath = getOpfPath(containerXml);
-  const opfFile = await getOpfFile(folderUri, opfPath);
+    const opfPath = getOpfPath(containerXml);
+    const opfFile = await getOpfFile(folderUri, opfPath);
 
-  const { metadata, coverImagePath } = await getMetadataFromOpf(opfFile);
+    const { metadata, coverImagePath } = await getMetadataFromOpf(opfFile);
 
-  const { coverImageDataBase64 } = await getCoverImageData(folderUri, coverImagePath, opfPath);
+    const { coverImageDataBase64 } = await getCoverImageData(folderUri, coverImagePath, opfPath);
 
-  const coverLocalPath = await saveImageLocally(coverImageDataBase64, metadata.title!);
+    const coverLocalPath = await saveImageLocally(coverImageDataBase64, metadata.title!);
 
-  return {
-    metadata,
-    coverImagePath,
-    coverLocalPath,
-    folderUri,
-    opfUri: folderUri + `/${opfPath}`,
-  };
+    return {
+      metadata,
+      coverImagePath,
+      coverLocalPath,
+      folderUri,
+      opfUri: folderUri + `/${opfPath}`,
+    };
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
 }

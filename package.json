@@ -2,7 +2,6 @@
   "name": "booksmart-app",
   "main": "expo-router/entry",
   "version": "1.0.0",
-  "packageManager": "yarn@4.1.0",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
