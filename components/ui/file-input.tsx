@@ -59,9 +59,9 @@ export default function FileInput({ title, instruction, fileTypesLabel, fileType
       <View style={styles.container}>
         <Text style={styles.title}>
           {state === "default" && title}
-          {state === "uploading" && "Uploading..."}
-          {state === "uploaded" && "Uploaded"}
-          {state === "error" && "Error while uploading file"}
+          {state === "uploading" && "Loading file..."}
+          {state === "uploaded" && "File loaded"}
+          {state === "error" && "Error while loading file"}
         </Text>
 
         {state === "default" && <UploadSquare color="#939393" />}
