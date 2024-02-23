@@ -35,6 +35,7 @@ export default function BooksList({ title, list }: BooksListProps) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.list}
         renderItem={renderItem}
+        style={{ flexGrow: 0 }}
         horizontal
       />
     </View>

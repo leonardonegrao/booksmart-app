@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
-
-import Text from "@/components/ui/text";
-import BookItem from "@/components/home/book";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import api from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
@@ -38,10 +35,10 @@ export default function HomeScreen() {
         };
 
         result.forEach((book: Book) => {
-          if (book.percentageRead === 100) {
-            newLibraryState.finished.push(book);
-          } else if (book.percentageRead === 0) {
+          if (book.percentageRead === 0) {
             newLibraryState.notStarted.push(book);
+          } else if (book.percentageRead === 100) {
+            newLibraryState.finished.push(book);
           } else {
             newLibraryState.inProgress.push(book);
           }
@@ -63,33 +60,28 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {isEmpty && <EmptyState />}
 
-      {library.inProgress.length > 0 && (
-        <View style={styles.section}>
-          <Text fontType="serifBold" style={styles.title}>
-            Continue reading ({library.inProgress.length})
-          </Text>
+      <ScrollView>
+        {library.inProgress.length > 0 && (
+          <BooksList
+            title={`Continue reading (${library.notStarted.length})`}
+            list={library.notStarted}
+          />
+        )}
 
-          <View style={styles.booksList}>
-            {library.inProgress.map((book) => (
-              <BookItem
-                key={book.id}
-                bookId={book.id}
-                title={book.title}
-                coverKey={book.coverBucketKey!}
-                coverUri={book.coverLocalUri!}
-                percentageRead={book.percentageRead}
-              />
-            ))}
-          </View>
-        </View>
-      )}
+        {library.notStarted.length > 0 && (
+          <BooksList
+            title={`Not started (${library.notStarted.length})`}
+            list={library.notStarted}
+          />
+        )}
 
-      {library.notStarted.length > 0 && (
-        <BooksList
-          title={`Not started (${library.notStarted.length})`}
-          list={library.notStarted}
-        />
-      )}
+        {library.finished.length > 0 && (
+          <BooksList
+            title={`Finished (${library.finished.length})`}
+            list={library.finished}
+          />
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -99,17 +91,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "flex-start",
     justifyContent: "flex-start",
-  },
-  section: {
-    gap: 14,
-  },
-  title: {
-    fontSize: 17,
-    color: "#1E1E1E",
-    padding: 16,
-  },
-  booksList: {
-    paddingHorizontal: 16,
-    gap: 16,
+    gap: 24,
   },
 });
