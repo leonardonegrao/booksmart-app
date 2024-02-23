@@ -134,16 +134,14 @@ async function saveContentLocally(zip: JSZip, fileName: string) {
   try {
     await Promise.all(
       Object.keys(zip.files).map(async (filename) => {
-        if (zip.files[filename].dir) {
-          const newDir = folderUri + "/" + filename;
-          await FileSystem.makeDirectoryAsync(newDir, { intermediates: true });
-        }
-
         if (!zip.files[filename].dir) {
+          const filePath = folderUri + "/" + filename;
           const fileContent = await zip.file(filename)?.async("base64");
+
+          const fileDirPath = filePath.substring(0, filePath.lastIndexOf("/"));
+          await FileSystem.makeDirectoryAsync(fileDirPath, { intermediates: true });
   
           if (fileContent) {
-            const filePath = folderUri + "/" + filename;
             await FileSystem.writeAsStringAsync(
               filePath,
               fileContent,
