@@ -8,6 +8,7 @@ import api from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
 import { Book } from "@/@types/book";
 import BooksList from "@/components/home/books-list";
+import EmptyState from "@/components/home/empty-state";
 
 interface LibraryBooks {
   inProgress: Book[];
@@ -18,6 +19,7 @@ interface LibraryBooks {
 export default function HomeScreen() {
   const { authState } = useAuth();
   const [library, setLibrary] = useState<LibraryBooks>({ inProgress: [], finished: [], notStarted: []});
+  const [isEmpty, setIsEmpty] = useState(false);
 
   const getBooks = async () => {
     try {
@@ -25,6 +27,7 @@ export default function HomeScreen() {
         const result = await api.getBooks(authState!.userData.id);
 
         if (result.length === 0) {
+          setIsEmpty(true);
           return;
         }
 
@@ -58,6 +61,8 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      {isEmpty && <EmptyState />}
+
       {library.inProgress.length > 0 && (
         <View style={styles.section}>
           <Text fontType="serifBold" style={styles.title}>
