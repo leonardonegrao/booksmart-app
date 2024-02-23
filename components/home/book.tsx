@@ -13,8 +13,6 @@ interface BookItemProps {
 
 export default function BookItem({
   bookId,
-  title,
-  coverKey,
   coverUri,
   percentageRead,
 }: BookItemProps) {
@@ -29,8 +27,6 @@ export default function BookItem({
     >
       <View style={styles.container}>
         <Image source={imageURI} style={styles.cover} />
-
-        <Text style={styles.title}>{title}</Text>
 
         <View
           style={{
@@ -63,7 +59,7 @@ const styles = StyleSheet.create({
     },
     shadowRadius: 18,
     shadowColor: "#1E1E1E",
-    shadowOpacity: 0.15,
+    shadowOpacity: 0, // temporary disabled
     backgroundColor: "transparent",
   },
   cover: {
@@ -72,13 +68,7 @@ const styles = StyleSheet.create({
     height: 311,
     // aspectRatio: 171 / 261,
     borderRadius: 7,
-    marginBottom: 6,
-  },
-  title: {
-    fontSize: 14,
-    fontFamily: "serif-bold",
-    color: "#1E1E1E",
-    marginBottom: 5,
+    marginBottom: 12,
   },
   progressBackground: {
     position: "relative",
