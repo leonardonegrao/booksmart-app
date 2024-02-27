@@ -146,13 +146,6 @@ export default `
           const range = selection.getRangeAt(0);
           const { left, right, top, bottom } = getRect(range, frame);
 
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              type: "Console",
-              log: contents.locationOf(cfiRange),
-            })
-          );
-
           const viewerEl = document.getElementById("viewer");
           const newEl = document.createElement("div");
 
@@ -170,22 +163,10 @@ export default `
           newEl.style.gap = "8px";
 
           const colors = [
-            {
-              bg: "#63C8D6",
-              id: "blue",
-            },
-            {
-              bg: "#63D675",
-              id: "green",
-            },
-            {
-              bg: "#D4D663",
-              id: "yellow",
-            },
-            {
-              bg: "#D66363",
-              id: "red",
-            },
+            { bg: "#63C8D6", id: "blue" },
+            { bg: "#63D675", id: "green" },
+            { bg: "#D4D663", id: "yellow" },
+            { bg: "#D66363", id: "red" },
           ];
 
           colors.forEach(color => {
@@ -199,35 +180,34 @@ export default `
             newEl.appendChild(circle);
 
             circle.addEventListener("click", (e) => {
-              rendition.annotations.add("highlight", cfiRange, {}, (e) => {
-                window.ReactNativeWebView.postMessage(
-                  JSON.stringify({
-                    type: "Console",
-                    log: "selected",
-                  })
-                );
-              },
-              "",
-              { "fill": color.bg }
+              rendition.annotations.add(
+                "highlight",
+                cfiRange,
+                {},
+                () => {},
+                "",
+                { "fill": color.bg }
               );
+
+              // TODO: in the future this will need to go to the top of the function
+              // as the other selection options need to pop-up, but for now it's fine
+              book.getRange(cfiRange).then((selectedRange) => {
+                const text = selectedRange.toString();
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                  type: "onSelected",
+                  cfiRange: cfiRange,
+                  text: text,
+                  color: color.bg,
+                }));
+              });
             });
           });
 
           viewerEl.appendChild(newEl);
           const frameEl = contents.document;
           frameEl.addEventListener("click", (e) => {
-              console.log(e.target, newEl);
               newEl.remove();
           });
-
-          // rendition.annotations.add("highlight", cfiRange, {}, (e) => {
-          //  window.ReactNativeWebView.postMessage(
-          //    JSON.stringify({
-          //      type: "Console",
-          //      log: "selected",
-          //    })
-          //  );
-          // });
         } catch (e) {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
@@ -236,23 +216,6 @@ export default `
             })
           );
         }
-      });
-
-      rendition.hooks.content.register((contents, view) => {
-        const frame = contents.document.defaultView.frameElement;
-        contents.document.onclick = e => {
-          e.preventDefault();
-          const selection = contents.window.getSelection();
-          const range = selection.getRangeAt(0);
-          const { left, right, top, bottom } = getRect(range, frame);
-
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              type: "Console",
-              log: "click " + left,
-            })
-          );
-        };
       });
 
       const getRect = (target, frame) => {

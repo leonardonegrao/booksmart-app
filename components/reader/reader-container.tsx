@@ -37,6 +37,10 @@ export default function ReaderContainer({ bookId, lastLocation, bookUri, title, 
     router.navigate("/(tabs)/");
   };
 
+  const onSelected = (contents: string, cfiRange: string) => {
+    console.log(contents, cfiRange);
+  };
+
   return (
     <View style={{ width: "100%" }}>
       <ReaderHeader title={title} author={author} onBackPress={onBackPress} />
@@ -49,6 +53,7 @@ export default function ReaderContainer({ bookId, lastLocation, bookUri, title, 
             width={calculatedWidth}
             initialLocation={lastLocation}
             defaultTheme={defaultTheme}
+            onSelected={onSelected}
             renderOpeningBookComponent={() => OpeningBookIndicator({ calculatedHeight })}
           />
         </View>
