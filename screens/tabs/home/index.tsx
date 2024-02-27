@@ -63,8 +63,8 @@ export default function HomeScreen() {
       <ScrollView>
         {library.inProgress.length > 0 && (
           <BooksList
-            title={`Continue reading (${library.notStarted.length})`}
-            list={library.notStarted}
+            title={`Continue reading (${library.inProgress.length})`}
+            list={library.inProgress}
           />
         )}
 

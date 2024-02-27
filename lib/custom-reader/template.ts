@@ -5,8 +5,266 @@ export default `
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EPUB.js</title>
-    <script id="jszip"></script>
-    <script id="epubjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+    <script>
+      let book;
+      let rendition;
+
+      const type = window.type;
+      const file = window.book;
+      const theme = window.theme;
+      const initialLocations = window.locations;
+      const enableSelection = window.enable_selection;
+
+      if (!file) {
+        alert('Failed load book');
+      }
+
+      try {
+        book = ePub(file);
+      } catch (e) {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: "Console",
+            log: \`Error on line 24: 'book = ePub(file);' - \${e.message}\`,
+          })
+        );
+      }
+
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onStarted" }));
+
+      try {
+        rendition = book.renderTo("viewer", {
+          width: "100%",
+          height: "100%",
+          allowScriptedContent: true,
+        });
+      } catch (e) {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: "Console",
+            log: \`Error on line 35: 'rendition = book.renderTo(...' - \${e.message}\`,
+          })
+        );
+      }
+
+      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "Console", log: "Rendition created" }));
+
+      try {
+        book.ready
+          .then(() => {
+            window.ReactNativeWebView.postMessage(JSON.stringify({ type: "Console", log: "Book is ready" }));
+
+            if (initialLocations) {
+              return book.locations.load(initialLocations);
+            }
+
+            book.locations.generate(1600).then(() => {
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: "onLocationsReady",
+                  epubKey: book.key(),
+                  locations: book.locations.save(),
+                })
+              );
+            });
+          })
+          .then(() => {
+            const displayed = rendition.display();
+
+            displayed.then(() => {
+              const currentLocation = rendition.currentLocation();
+
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: "onReady",
+                  totalLocations: book.locations.total,
+                  currentLocation: currentLocation,
+                  progress: book.locations.percentageFromCfi(currentLocation.start.cfi),
+                })
+              );
+            });
+          });
+      } catch (e) {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: "Console",
+            log: \`Error on line 53: 'book.ready.then(...' - \${e.message}\`,
+          })
+        );
+      }
+
+      rendition.on("started", () => {
+        rendition.themes.register({ theme: theme });
+        rendition.themes.select("theme");
+      });
+
+      rendition.on("relocated", (location) => {
+        const percent = book.locations.percentageFromCfi(location.start.cfi);
+        const percentage = Math.floor(percent * 100);
+
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: "onLocationChange",
+            totalLocations: book.locations.total,
+            currentLocation: location,
+            progress: percentage,
+          })
+        );
+
+        if (location.atStart) {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "onBeginning",
+            })
+          );
+        }
+
+        if (location.atEnd) {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "onFinish",
+            })
+          );
+        }
+      });
+
+      rendition.on("rendered", () => {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: "onRendered",
+            section: section,
+            currentSection: book.navigation.get(section.href),
+          })
+        );
+      });
+
+      rendition.on("selected", (cfiRange, contents) => {
+        try {
+          const frame = contents.document.defaultView.frameElement;
+          const selection = contents.window.getSelection();
+          const range = selection.getRangeAt(0);
+          const { left, right, top, bottom } = getRect(range, frame);
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "Console",
+              log: contents.locationOf(cfiRange),
+            })
+          );
+
+          const viewerEl = document.getElementById("viewer");
+          const newEl = document.createElement("div");
+
+          const topPos = bottom + 4;
+
+          newEl.style.position = "absolute";
+          newEl.style.left = left + "px";
+          newEl.style.top = topPos + "px";
+          newEl.style.backgroundColor = "#F8F8F8";
+          newEl.style.padding = "8px";
+          newEl.style.border = "1px solid rgba(63, 63, 63, 0.1)";
+          newEl.style.borderRadius = "16px";
+          newEl.style.boxShadow = '0px 8px 18px 0px rgba(30, 30, 30, 0.15)';
+          newEl.style.display = "flex";
+          newEl.style.gap = "8px";
+
+          const colors = [
+            {
+              bg: "#63C8D6",
+              id: "blue",
+            },
+            {
+              bg: "#63D675",
+              id: "green",
+            },
+            {
+              bg: "#D4D663",
+              id: "yellow",
+            },
+            {
+              bg: "#D66363",
+              id: "red",
+            },
+          ];
+
+          colors.forEach(color => {
+            const circle = document.createElement("div");
+            circle.id = color.id;
+            circle.style.width = "24px";
+            circle.style.height = "24px";
+            circle.style.borderRadius = "50%";
+            circle.style.backgroundColor = color.bg;
+
+            newEl.appendChild(circle);
+
+            circle.addEventListener("click", (e) => {
+              rendition.annotations.add("highlight", cfiRange, {}, (e) => {
+                window.ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: "Console",
+                    log: "selected",
+                  })
+                );
+              },
+              "",
+              { "fill": color.bg }
+              );
+            });
+          });
+
+          viewerEl.appendChild(newEl);
+          const frameEl = contents.document;
+          frameEl.addEventListener("click", (e) => {
+              console.log(e.target, newEl);
+              newEl.remove();
+          });
+
+          // rendition.annotations.add("highlight", cfiRange, {}, (e) => {
+          //  window.ReactNativeWebView.postMessage(
+          //    JSON.stringify({
+          //      type: "Console",
+          //      log: "selected",
+          //    })
+          //  );
+          // });
+        } catch (e) {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "Console",
+              log: \`Error on line 68: 'rendition.annotations.add(...' - \${e.message}\`,
+            })
+          );
+        }
+      });
+
+      rendition.hooks.content.register((contents, view) => {
+        const frame = contents.document.defaultView.frameElement;
+        contents.document.onclick = e => {
+          e.preventDefault();
+          const selection = contents.window.getSelection();
+          const range = selection.getRangeAt(0);
+          const { left, right, top, bottom } = getRect(range, frame);
+
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: "Console",
+              log: "click " + left,
+            })
+          );
+        };
+      });
+
+      const getRect = (target, frame) => {
+        const rect = target.getBoundingClientRect();
+        const viewElementRect = frame ? frame.getBoundingClientRect() : { top: 0, left: 0 };
+        const left = rect.left + viewElementRect.left;
+        const right = rect.right + viewElementRect.left;
+        const top = rect.top + viewElementRect.top;
+        const bottom = rect.bottom + viewElementRect.top;
+        return { left, right, top, bottom };
+      };
+    </script>
 
     <style type="text/css">
       body {
@@ -26,209 +284,6 @@ export default `
 
   <body oncopy='return false' oncut='return false'>
     <div id="viewer"></div>
-
-    <script>
-      let book;
-      let rendition;
-
-      const type = window.type;
-      const file = window.book;
-      const theme = window.theme;
-      const initialLocations = window.locations;
-      const enableSelection = window.enable_selection;
-
-      if (!file) {
-        alert('Failed load book');
-      }
-
-      if (type === 'epub' || type === 'opf' || type === 'binary') {
-        book = ePub(file);
-      } else if (type === 'base64') {
-        book = ePub(file, { encoding: "base64" });
-      } else {
-        alert('Missing file type');
-      }
-
-      rendition = book.renderTo("viewer", {
-        width: "100%",
-        height: "100%",
-      });
-
-      window.ReactNativeWebView.postMessage(JSON.stringify({ type: "onStarted" }));
-
-      book.ready
-        .then(function () {
-          if (initialLocations) {
-            return book.locations.load(initialLocations);
-          }
-
-          book.locations.generate(1600).then(function () {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: "onLocationsReady",
-              epubKey: book.key(),
-              locations: book.locations.save(),
-            }));
-          });
-        })
-        .then(function () {
-          var displayed = rendition.display();
-
-          displayed.then(function () {
-            var currentLocation = rendition.currentLocation();
-
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: "onReady",
-              totalLocations: book.locations.total,
-              currentLocation: currentLocation,
-              progress: book.locations.percentageFromCfi(currentLocation.start.cfi),
-            }));
-          });
-
-          book
-          .coverUrl()
-          .then(async (url) => {
-            var reader = new FileReader();
-            reader.onload = (res) => {
-              window.ReactNativeWebView.postMessage(
-                JSON.stringify({
-                  type: "meta",
-                  metadata: {
-                    cover: reader.result,
-                    author: book.package.metadata.creator,
-                    title: book.package.metadata.title,
-                    description: book.package.metadata.description,
-                    language: book.package.metadata.language,
-                    publisher: book.package.metadata.publisher,
-                    rights: book.package.metadata.rights,
-                  },
-                })
-              );
-            };
-            reader.readAsDataURL(await fetch(url).then((res) => res.blob()));
-          })
-          .catch(() => {
-            window.ReactNativeWebView.postMessage(
-              JSON.stringify({
-                type: "meta",
-                metadata: {
-                  cover: undefined,
-                  author: book.package.metadata.creator,
-                  title: book.package.metadata.title,
-                  description: book.package.metadata.description,
-                  language: book.package.metadata.language,
-                  publisher: book.package.metadata.publisher,
-                  rights: book.package.metadata.rights,
-                },
-              })
-            );
-          });
-
-          book.loaded.navigation.then(function (toc) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'onNavigationLoaded',
-              toc: toc,
-            }));
-          });
-        })
-        .catch(function (err) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: "onDisplayError",
-          reason: reason
-        }));
-      });
-
-      rendition.on('started', () => {
-        rendition.themes.register({ theme: theme });
-        rendition.themes.select('theme');
-      });
-
-      rendition.on("relocated", function (location) {
-        var percent = book.locations.percentageFromCfi(location.start.cfi);
-        var percentage = Math.floor(percent * 100);
-
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: "onLocationChange",
-          totalLocations: book.locations.total,
-          currentLocation: location,
-          progress: percentage,
-        }));
-
-        if (location.atStart) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: "onBeginning",
-          }));
-        }
-
-        if (location.atEnd) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: "onFinish",
-          }));
-        }
-      });
-
-      rendition.on("orientationchange", function (orientation) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'onOrientationChange',
-          orientation: orientation
-        }));
-      });
-
-      rendition.on("rendered", function (section) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'onRendered',
-          section: section,
-          currentSection: book.navigation.get(section.href),
-        }));
-      });
-
-      rendition.on("layout", function (layout) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'onLayout',
-          layout: layout,
-        }));
-      });
-
-      rendition.on("selected", function (cfiRange, contents) {
-        rendition.annotations.highlight(cfiRange, {}, (e) => {
-          console.log("highlight clicked", e.target);
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'Console',
-            data: contents.window.getSelection().toString(),
-          }));
-        });
-
-        contents.window.getSelection().removeAllRanges();
-          book.getRange(cfiRange).then(function (range) {
-            if (range) {
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'onSelected',
-                cfiRange: cfiRange,
-                text: range.toString(),
-              }));
-            }
-          });
-        });
-
-        rendition.on("markClicked", function (cfiRange, contents) {
-          rendition.annotations.remove(cfiRange, "highlight");
-          book.getRange(cfiRange).then(function (range) {
-            if (range) {
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'onMarkPressed',
-                cfiRange: cfiRange,
-                text: range.toString(),
-              }));
-            }
-          });
-        });
-
-        rendition.on("resized", function (layout) {
-          window.ReactNativeWebView.postMessage(JSON.stringify({
-            type: 'onResized',
-            layout: layout,
-          }));
-        });
-    </script>
   </body>
 </html>
 `;

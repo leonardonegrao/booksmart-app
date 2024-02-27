@@ -24,8 +24,8 @@ export default function ReaderHeader({ title, author, onBackPress }: ReaderHeade
         </View>
       </TouchableOpacity>
 
-      <View style={{ alignItems: "center" }}>
-        <Text fontType="serifMedium" style={{ fontSize: 16 }}>
+      <View style={{ alignItems: "center", maxWidth: "70%" }}>
+        <Text fontType="serifMedium" style={{ fontSize: 14, textAlign: "center" }}>
           {title}
         </Text>
         <Text fontType="serifRegular" style={{ fontSize: 12 }}>

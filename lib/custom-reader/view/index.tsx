@@ -80,13 +80,12 @@ export function View({
     const parsedEvent = JSON.parse(event.nativeEvent.data);
 
     const { type } = parsedEvent;
-    console.log("type", type);
 
     delete parsedEvent.type;
 
     if (type === "Console") {
-      const { data } = parsedEvent;
-      const { type, log } = data;
+      const { log } = parsedEvent;
+      // eslint-disable-next-line no-console
       console.log(log);
     }
 
@@ -161,7 +160,6 @@ export function View({
     }
 
     if (type === "onSelected") {
-      console.log("onSelected");
       const { cfiRange, text } = parsedEvent;
 
       return onSelected(text, cfiRange);
@@ -282,6 +280,7 @@ export function View({
                 showsVerticalScrollIndicator={false}
                 javaScriptEnabled
                 injectedJavaScript={debugging}
+                webviewDebuggingEnabled={true}
                 originWhitelist={["*"]}
                 scrollEnabled={false}
                 mixedContentMode="compatibility"

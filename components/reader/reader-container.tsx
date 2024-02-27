@@ -7,7 +7,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ReaderHeader from "./reader-header";
 import ReaderFooter from "./reader-footer";
 import api from "@/services/api";
-import { useEffect } from "react";
 
 interface ReaderContainerProps {
   bookId: string;
@@ -66,6 +65,7 @@ export default function ReaderContainer({ bookId, lastLocation, bookUri, title, 
 const defaultTheme = {
   body: {
     background: "#FAFAFA",
+    "-webkit-touch-callout": "none",
   },
   span: {
     color: "#1E1E1EB2 !important",

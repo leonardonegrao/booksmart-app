@@ -187,6 +187,9 @@ export default async function getMetadata(fileData: string, fileName: string) {
 
     const coverLocalPath = await saveImageLocally(coverImageDataBase64, metadata.title!);
 
+    console.log("folderUri", folderUri);
+    console.log("opfPath", opfPath);
+
     return {
       metadata,
       coverImagePath,

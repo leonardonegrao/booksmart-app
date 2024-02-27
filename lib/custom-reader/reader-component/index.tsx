@@ -50,6 +50,7 @@ export function Reader({
       const jszipFileUri = `${FileSystem.documentDirectory}jszip.min.js`;
       const epubjsFileUri = `${FileSystem.documentDirectory}epub.min.js`;
 
+
       try {
         await FileSystem.writeAsStringAsync(jszipFileUri, jszip);
       } catch (e) {
