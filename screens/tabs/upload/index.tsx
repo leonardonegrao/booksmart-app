@@ -94,7 +94,7 @@ export default function UploadScreen() {
 
       <View style={{ width: "100%" }}>
         <FileInput
-          title={file ? file.name : "Upload your book"}
+          title={file ? file.name : "Select your book"}
           instruction={file ? "Your file is ready" : "Select your .epub file"}
           fileTypes="application/epub+zip"
           value={file}
