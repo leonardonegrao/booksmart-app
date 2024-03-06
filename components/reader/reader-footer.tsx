@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { TouchableOpacity } from "react-native";
 
 import { BookmarkIcon, SettingsIcon } from "../icons";
@@ -17,14 +17,18 @@ export default function ReaderFooter({ currentLocation, totalLocations, progress
         <BookmarkIcon fontSize={24} color="#939393" />
       </TouchableOpacity>
 
-      <View style={{ alignItems: "center" }}>
-        <Text fontType="serifMedium" style={{ fontSize: 16 }}>
-          {currentLocation}/{totalLocations}
-        </Text>
-        <Text fontType="serifRegular" style={{ fontSize: 12 }}>
-          {progress}%
-        </Text>
-      </View>
+      {totalLocations !== "0" ? (
+        <View style={{ alignItems: "center" }}>
+          <Text fontType="serifMedium" style={{ fontSize: 16 }}>
+            {currentLocation}/{totalLocations}
+          </Text>
+          <Text fontType="serifRegular" style={{ fontSize: 12 }}>
+            {progress}%
+          </Text>
+        </View>
+      ) : (
+        <ActivityIndicator />
+      )}
 
       <TouchableOpacity style={styles.headerButton}>
         <SettingsIcon fontSize={24} color="#939393" />
