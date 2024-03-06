@@ -1,3 +1,5 @@
+import { Link } from "expo-router";
+import type { Href } from "expo-router";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
@@ -6,9 +8,27 @@ interface ButtonProps {
   // eslint-disable-next-line no-unused-vars
   onPress?: ((event: GestureResponderEvent) => void) | undefined;
   state?: "default" | "loading" | "disabled";
+  href?: Href<string>;
 }
 
-export default function Button({ label, onPress, state = "default" }: ButtonProps) {
+export default function Button({ label, onPress, state = "default", href }: ButtonProps) {
+  if (href) {
+    return (
+      <TouchableOpacity
+        style={state !== "default" ? { ...styles.button, ...styles.disabled } : styles.button}
+        onPress={onPress}
+      >
+        <Link href={href}>
+          <Text
+            style={state !== "default" ? { ...styles.label, ...styles.labelDisabled } : styles.label}
+          >
+            {label}
+          </Text>
+        </Link>
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <TouchableOpacity
       style={state !== "default" ? { ...styles.button, ...styles.disabled } : styles.button}

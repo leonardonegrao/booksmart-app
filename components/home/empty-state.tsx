@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, SafeAreaView, View } from "react-native";
 import { Image } from "expo-image";
 import Text from "../ui/text";
 
@@ -7,7 +7,7 @@ import Button from "../ui/button";
 
 export default function EmptyState() {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text fontType="serifSemibold" style={{ fontSize: 24, color: "#939393" }}>
         Welcome to your library!
       </Text>
@@ -19,15 +19,14 @@ export default function EmptyState() {
           You don't have any books yet. Start by adding a new book to your library.
         </Text>
 
-        <Button label="Upload your first book" />
+        <Button label="Upload your first book" href="/(tabs)/upload" />
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
