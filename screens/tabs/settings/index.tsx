@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
 import { ChevronRight } from "@/components/icons";
 import { useAuth } from "@/context/AuthContext";
+import api from "@/services/api";
 
 const settingsList = [
   {
@@ -51,6 +52,16 @@ export default function SettingsScreen() {
     } catch (e) {
       alert("There was an issue logging out, please try again.");
     }
+  };
+
+  const handleClearLibrary = async () => {
+    try {
+      await api.clearLibrary();
+    } catch (error) {
+      alert("There was an issue clearing the library, please try again.");
+    }
+
+    alert("Library cleared");
   };
 
   return (
@@ -109,6 +120,11 @@ export default function SettingsScreen() {
       ))}
 
       <View style={{ ...styles.settingsItemContainer, width: "100%" }}>
+        <TouchableOpacity onPress={handleClearLibrary}>
+          <Text style={{ color: "#ED7979", fontSize: 14, fontFamily: "sans-medium", paddingVertical: 12 }}>
+            Clear library
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity>
           <Text style={{ color: "#ED7979", fontSize: 14, fontFamily: "sans-medium", paddingVertical: 12 }}>
             Delete account
