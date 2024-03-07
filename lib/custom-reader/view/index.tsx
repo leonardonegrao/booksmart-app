@@ -160,9 +160,9 @@ export function View({
     }
 
     if (type === "onSelected") {
-      const { cfiRange, text } = parsedEvent;
+      const { cfiRange, text, color } = parsedEvent;
 
-      return onSelected(text, cfiRange);
+      return onSelected(text, cfiRange, color);
     }
 
     if (type === "onMarkPressed") {

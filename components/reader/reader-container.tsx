@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ReaderHeader from "./reader-header";
 import ReaderFooter from "./reader-footer";
 import api from "@/services/api";
+import db from "@/services/db";
 
 interface ReaderContainerProps {
   bookId: string;
@@ -37,8 +38,11 @@ export default function ReaderContainer({ bookId, lastLocation, bookUri, title, 
     router.navigate("/(tabs)/");
   };
 
-  const onSelected = (contents: string, cfiRange: string) => {
-    console.log(contents, cfiRange);
+  const onSelected = async (contents: string, cfiRange: string, color: string) => {
+    const dbInstance = db.openDatabase();
+    
+    db.createHighlightsTable(dbInstance);
+    db.insertHighlight(dbInstance, bookId, cfiRange, color, contents);
   };
 
   return (

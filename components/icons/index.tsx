@@ -179,6 +179,14 @@ const BrainIcon = (props: SvgProps) => (
   </Svg>
 );
 
+const MenuDotsVertical = (props: SvgProps) => (
+  <Svg width={props.fontSize || 24} height={props.fontSize || 24} viewBox="0 0 24 24" fill="none" {...props}>
+    <Path d="M11.992 12H12.001" stroke="currentColor" strokeOpacity="0.7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M11.9842 18H11.9932" stroke="currentColor" strokeOpacity="0.7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <Path d="M11.9998 6H12.0088" stroke="currentColor" strokeOpacity="0.7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </Svg>
+);
+
 export {
   LibraryIcon,
   UploadBookIcon,
@@ -189,4 +197,5 @@ export {
   ChevronRight,
   ChevronLeft,
   BrainIcon,
+  MenuDotsVertical,
 };

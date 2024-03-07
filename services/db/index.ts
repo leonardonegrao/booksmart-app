@@ -173,6 +173,107 @@ const getBook = (bookId: string) => {
   });
 };
 
+const createHighlightsTable = (db: SQLiteDatabase) => {
+  let transactionResult: null | "success" | "error" = null;
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      `
+        CREATE TABLE IF NOT EXISTS highlights
+        (
+          id TEXT,
+          bookId TEXT,
+          location TEXT,
+          color TEXT,
+          content TEXT
+        );`,
+    [],
+    () => transactionResult = "success" as const,
+    () => {
+      transactionResult = "error" as const;
+      return false;
+    },
+    );
+  });
+
+  return transactionResult;
+};
+
+const dropHighlightsTable = (db: SQLiteDatabase) => {
+  let transactionResult: null | "success" | "error" = null;
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      "DROP TABLE IF EXISTS highlights;",
+      [],
+      () => transactionResult = "success" as const,
+      () => {
+        transactionResult = "error" as const;
+        return false;
+      },
+    );
+  });
+
+  return transactionResult;
+};
+
+const insertHighlight = (db: SQLiteDatabase, bookId: string, location: string, color: string, content: string) => {
+  let transactionResult: null | "success" | "error" = null;
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      "INSERT INTO highlights (id, bookId, location, color, content) VALUES (?, ?, ?, ?, ?);",
+      [bookId + location, bookId, location, color, content],
+      () => transactionResult = "success" as const,
+      () => {
+        transactionResult = "error" as const;
+        return false;
+      },
+    );
+  });
+
+  return transactionResult;
+};
+
+const deleteHighlight = (db: SQLiteDatabase, bookId: string, location: string) => {
+  let transactionResult: null | "success" | "error" = null;
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      "DELETE FROM highlights WHERE bookId = ? AND location = ?;",
+      [bookId, location],
+      () => transactionResult = "success" as const,
+      () => {
+        transactionResult = "error" as const;
+        return false;
+      },
+    );
+  });
+
+  return transactionResult;
+};
+
+const getHighlights = (db: SQLiteDatabase, bookId: string) => {
+  return new Promise<string[]>((resolve) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM highlights WHERE bookId = ?;",
+        [bookId],
+        (_, { rows }) => {
+          const highlights: string[] = [];
+          for (let i = 0; i < rows.length; i++) {
+            highlights.push(rows.item(i).location);
+          }
+          resolve(highlights);
+        },
+        () => {
+          return false;
+        },
+      );
+    });
+  });
+};
+
 export default {
   openDatabase,
   createBookTable,
@@ -181,4 +282,9 @@ export default {
   getBooks,
   getBook,
   updateBookProgress,
+  createHighlightsTable,
+  dropHighlightsTable,
+  insertHighlight,
+  deleteHighlight,
+  getHighlights,
 };
