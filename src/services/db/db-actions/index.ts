@@ -1,34 +1,11 @@
-import type { SQLiteDatabase } from "expo-sqlite";
-
-interface CreateTableInput {
-  db: SQLiteDatabase;
-  tableName: "books" | "highlights";
-  fields: { key: string; type: "TEXT" | "INTEGER" }[];
-}
-
-interface DropTableInput {
-  db: SQLiteDatabase;
-  tableName: "books" | "highlights";
-}
-
-interface InsertRowInput {
-  db: SQLiteDatabase;
-  tableName: "books" | "highlights";
-  fields: string[];
-  values: any[];
-}
-
-interface GetAllInput {
-  db: SQLiteDatabase;
-  tableName: "books" | "highlights";
-}
-
-interface GetManyInput extends GetAllInput {
-  fieldFilter: string;
-  valueFilter: string | number;
-}
-
-interface GetOneInput extends GetManyInput {}
+import type {
+  CreateTableInput,
+  DropTableInput,
+  InsertRowInput,
+  GetAllInput,
+  GetManyInput,
+  GetOneInput,
+} from "@/src/@types/storage";
 
 export const createTable = ({ db, tableName, fields }: CreateTableInput) => {
   let transactionResult: null | "success" | "error" = null;
