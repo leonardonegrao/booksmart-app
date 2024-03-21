@@ -106,6 +106,14 @@ const database = {
         ],
       });
     },
+    delete: (db: SQLiteDatabase, bookId: string) => {
+      return dbActions.deleteRow({
+        db,
+        tableName: "books",
+        fieldFilter: "id",
+        valueFilter: bookId,
+      });
+    },
     getAll: (db: SQLiteDatabase) => {
       return dbActions.getAll({ db, tableName: "books" });
     },

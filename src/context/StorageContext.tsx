@@ -49,11 +49,64 @@ export const StorageProvider = ({ children }: { children: React.ReactNode }) => 
       if (!dbInstance) return { error: "DB is not defined." };
       
       if (type === "book") {
+        // handle files and save to storage
         database.books.insert(dbInstance, data as InsertBookInput);
       }
       
       if (type === "highlight") {
         database.highlights.insert(dbInstance, data as InsertHighlightInput);
+      }
+    },
+    update: <T extends DataType>(type: T, data: DataTypeMap[T]) => {
+      if (!dbInstance) return { error: "DB is not defined." };
+
+      if (type === "book") {
+        database.books.update(dbInstance, data as InsertBookInput);
+      }
+    },
+    remove: <T extends DataType>(type: T, id: string) => {
+      if (!dbInstance) return { error: "DB is not defined." };
+
+      if (type === "book") {
+        // delete files as well
+        database.books.delete(dbInstance, id);
+      }
+
+      if (type === "highlight") {
+        database.highlights.delete(dbInstance, id);
+      }
+    },
+    getAll: <T extends DataType>(type: T) => {
+      if (!dbInstance) return { error: "DB is not defined." };
+
+      if (type === "book") {
+        return database.books.getAll(dbInstance);
+      }
+    },
+    findMany: <T extends DataType>(type: T, field: string, value: string | number) => {
+      if (!dbInstance) return { error: "DB is not defined." };
+
+      if (type === "highlight") {
+        return database.highlights.getAllFromBook(dbInstance, value as string);
+      }
+    },
+    findOne: <T extends DataType>(type: T, field: string, value: string | number) => {
+      if (!dbInstance) return { error: "DB is not defined." };
+
+      if (type === "book") {
+        return database.books.findOne(dbInstance, value as string);
+      }
+    },
+    drop: <T extends DataType>(type: T) => {
+      if (!dbInstance) return { error: "DB is not defined." };
+
+      if (type === "book") {
+        // also delete files
+        database.books.dropTable(dbInstance);
+      }
+
+      if (type === "highlight") {
+        database.highlights.dropTable(dbInstance);
       }
     },
   };

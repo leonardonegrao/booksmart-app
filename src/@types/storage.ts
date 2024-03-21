@@ -61,10 +61,10 @@ export interface InsertHighlightInput {
 
 // Storage context
 
-export type DataTypeMap = {
+export interface DataTypeMap {
   book: InsertBookInput;
   highlight: InsertHighlightInput;
-};
+}
 
 export type DataType = keyof DataTypeMap;
 
