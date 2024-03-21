@@ -9,6 +9,7 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import { StyleSheet, View } from "react-native";
 import SwipeHandler from "./swipe-handler";
 import { useReader } from "@/src/context/ReaderContext";
+import { Location } from "@/src/@types/book";
 
 interface ReaderWebViewProps {
   src: string;

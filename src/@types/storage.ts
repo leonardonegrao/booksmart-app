@@ -1,4 +1,6 @@
 import type { SQLiteDatabase } from "expo-sqlite";
+import type { Book } from "./book";
+import type Highlight from "./highlight";
 
 // Database actions
 
@@ -20,6 +22,14 @@ export interface InsertRowInput {
   values: any[];
 }
 
+export interface UpdateRowInput {
+  db: SQLiteDatabase;
+  tableName: "books" | "highlights";
+  fields: string[];
+  values: any[];
+  id: string;
+}
+
 export interface GetAllInput {
   db: SQLiteDatabase;
   tableName: "books" | "highlights";
@@ -36,12 +46,9 @@ export interface GetOneInput extends GetManyInput {}
 
 export interface InsertBookInput {
   id: string;
-  filename: string;
   userId: string;
-  bookSignedUrl: string;
-  bookBucketKey: string;
-  coverSignedUrl: string;
-  coverBucketKey: string;
+  bookBucketKey?: string;
+  coverBucketKey?: string;
   title: string;
   author: string;
   percentageRead: number;
@@ -62,7 +69,7 @@ export interface InsertHighlightInput {
 // Storage context
 
 export interface DataTypeMap {
-  book: InsertBookInput;
+  book: Omit<InsertBookInput, "id">;
   highlight: InsertHighlightInput;
 }
 
@@ -71,6 +78,25 @@ export type DataType = keyof DataTypeMap;
 export interface StorageProps {
   db: SQLiteDatabase | null;
   actions: {
+    saveBookFiles: (uri: string, name: string) => Promise<{
+      metadata: {
+          title: string | null | undefined;
+          author: string | null | undefined;
+          language: string | null | undefined;
+      };
+      coverImagePath: string;
+      coverLocalPath: string;
+      folderUri: string;
+      opfUri: string;
+    }>;
     save: <T extends DataType>(type: T, data: DataTypeMap[T]) => void;
+    update: <T extends DataType>(type: T, data: DataTypeMap[T]) => void;
+    remove: <T extends DataType>(type: T, id: string) => void;
+    getAll: <T extends keyof DataTypeMap>(type: T) => Promise<Book[]> | undefined;
+    findMany: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<Highlight[]> | undefined;
+    findOne: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<Book> | undefined;
+    drop: <T extends keyof DataTypeMap>(type: T) => {
+      error: string;
+    } | undefined;
   };
 }

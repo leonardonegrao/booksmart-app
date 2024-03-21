@@ -2,7 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Link } from "expo-router";
 import { ChevronRight } from "@/src/components/icons";
 import { useAuth } from "@/src/context/AuthContext";
-import api from "@/src/services/api";
+import { useStorage } from "@/src/context/StorageContext";
 
 const settingsList = [
   {
@@ -45,6 +45,7 @@ const settingsList = [
 
 export default function SettingsScreen() {
   const { onLogout } = useAuth();
+  const storage = useStorage();
 
   const handleLogout = async () => {
     try {
@@ -56,7 +57,7 @@ export default function SettingsScreen() {
 
   const handleClearLibrary = async () => {
     try {
-      await api.clearLibrary();
+      storage.actions.drop("book"); 
     } catch (error) {
       alert("There was an issue clearing the library, please try again.");
     }

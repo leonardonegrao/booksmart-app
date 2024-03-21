@@ -3,6 +3,8 @@ import * as dbActions from "./db-actions";
 
 import type { SQLiteDatabase } from "expo-sqlite";
 import type { InsertBookInput, InsertHighlightInput } from "@/src/@types/storage";
+import type { Book } from "@/src/@types/book";
+import type Highlight from "@/src/@types/highlight";
 
 const database = {
   openDatabase: () => {
@@ -16,7 +18,6 @@ const database = {
         tableName: "books",
         fields: [
           { key: "id", type: "TEXT" },
-          { key: "filename", type: "TEXT" },
           { key: "userId", type: "TEXT" },
           { key: "bookBucketKey", type: "TEXT" },
           { key: "bookLocalUri", type: "TEXT" },
@@ -40,7 +41,6 @@ const database = {
         tableName: "books",
         fields: [
           "id",
-          "filename",
           "userId",
           "bookBucketKey",
           "bookLocalUri",
@@ -55,12 +55,11 @@ const database = {
         ],
         values: [
           bookData.id,
-          bookData.filename,
           bookData.userId,
-          bookData.bookBucketKey,
+          "",
           bookData.bookLocalUri,
           bookData.epubLocalUri,
-          bookData.coverBucketKey,
+          "",
           bookData.coverLocalUri,
           bookData.title,
           bookData.author,
@@ -71,12 +70,11 @@ const database = {
       });
     },
     update: (db: SQLiteDatabase, bookData: InsertBookInput) => {
-      return dbActions.insertRow({
+      return dbActions.updateRow({
         db,
         tableName: "books",
         fields: [
           "id",
-          "filename",
           "userId",
           "bookBucketKey",
           "bookLocalUri",
@@ -91,7 +89,6 @@ const database = {
         ],
         values: [
           bookData.id,
-          bookData.filename,
           bookData.userId,
           bookData.bookBucketKey,
           bookData.bookLocalUri,
@@ -104,6 +101,7 @@ const database = {
           bookData.lastLocation,
           bookData.language,
         ],
+        id: bookData.id,
       });
     },
     delete: (db: SQLiteDatabase, bookId: string) => {
@@ -115,10 +113,10 @@ const database = {
       });
     },
     getAll: (db: SQLiteDatabase) => {
-      return dbActions.getAll({ db, tableName: "books" });
+      return dbActions.getAll<Book>({ db, tableName: "books" });
     },
     findOne: (db: SQLiteDatabase, bookId: string) => {
-      return dbActions.getOne({
+      return dbActions.getOne<Book>({
         db,
         tableName: "books",
         fieldFilter: "id",
@@ -166,7 +164,7 @@ const database = {
       });
     },
     getAllFromBook: (db: SQLiteDatabase, bookId: string) => {
-      return dbActions.getMany({
+      return dbActions.getMany<Highlight>({
         db,
         tableName: "highlights",
         fieldFilter: "bookId",

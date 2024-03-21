@@ -1,4 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import * as FileSystem from "expo-file-system";
+
+import database from "@/src/services/db";
+
 import type { SQLiteDatabase } from "expo-sqlite";
 import type {
   DataType,
@@ -7,14 +11,11 @@ import type {
   InsertHighlightInput,
   StorageProps,
 } from "@/src/@types/storage";
-
-import database from "@/src/services/db";
+import loadBook, { formatFileName } from "../utils/loadBook";
 
 const initialValue: StorageProps = {
   db: null,
-  actions: {
-    save: () => {},
-  },
+  actions: {} as StorageProps["actions"],
 };
 
 const StorageContext = createContext<StorageProps>(initialValue);
@@ -45,12 +46,17 @@ export const StorageProvider = ({ children }: { children: React.ReactNode }) => 
   }, []);
 
   const storageActions = {
+    saveBookFiles: async (uri: string, name: string) => {
+      const fileData = await FileSystem.readAsStringAsync(uri, { encoding: "base64" });
+      return await loadBook(fileData, name);
+    },
     save: <T extends DataType>(type: T, data: DataTypeMap[T]) => {
       if (!dbInstance) return { error: "DB is not defined." };
       
       if (type === "book") {
-        // handle files and save to storage
-        database.books.insert(dbInstance, data as InsertBookInput);
+        const bookId = `${formatFileName((data as InsertBookInput).title)}-${Date.now().toString()}`;
+
+        database.books.insert(dbInstance, { id: bookId, ...data } as InsertBookInput);
       }
       
       if (type === "highlight") {
@@ -77,21 +83,21 @@ export const StorageProvider = ({ children }: { children: React.ReactNode }) => 
       }
     },
     getAll: <T extends DataType>(type: T) => {
-      if (!dbInstance) return { error: "DB is not defined." };
+      if (!dbInstance) return;
 
       if (type === "book") {
         return database.books.getAll(dbInstance);
       }
     },
     findMany: <T extends DataType>(type: T, field: string, value: string | number) => {
-      if (!dbInstance) return { error: "DB is not defined." };
+      if (!dbInstance) return;
 
       if (type === "highlight") {
         return database.highlights.getAllFromBook(dbInstance, value as string);
       }
     },
     findOne: <T extends DataType>(type: T, field: string, value: string | number) => {
-      if (!dbInstance) return { error: "DB is not defined." };
+      if (!dbInstance) return;
 
       if (type === "book") {
         return database.books.findOne(dbInstance, value as string);

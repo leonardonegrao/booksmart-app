@@ -5,6 +5,7 @@ import type {
   GetAllInput,
   GetManyInput,
   GetOneInput,
+  UpdateRowInput,
 } from "@/src/@types/storage";
 
 export const createTable = ({ db, tableName, fields }: CreateTableInput) => {
@@ -74,7 +75,7 @@ export const insertRow = ({ db, tableName, fields, values }: InsertRowInput) => 
   return transactionResult;
 };
 
-export const updateRow = ({ db, tableName, fields, values }: InsertRowInput) => {
+export const updateRow = ({ db, tableName, fields, values, id }: UpdateRowInput) => {
   let transactionResult: null | "success" | "error" = null;
 
   db.transaction((tx) => {
@@ -82,8 +83,9 @@ export const updateRow = ({ db, tableName, fields, values }: InsertRowInput) => 
       `
         UPDATE ${tableName} SET
         ${fields.map((field) => `${field} = ?`).join(", ")}
+        WHERE id = ?;
       `,
-      values,
+      [...values, id],
       () => {
         transactionResult = "success";
       },

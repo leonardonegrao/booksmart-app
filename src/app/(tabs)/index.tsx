@@ -1,7 +1,10 @@
+import { StorageProvider } from "@/src/context/StorageContext";
 import HomeScreen from "@/src/screens/tabs/home";
 
 export default function Home() {
   return (
-    <HomeScreen />
+    <StorageProvider>
+      <HomeScreen />
+    </StorageProvider>
   );
 }

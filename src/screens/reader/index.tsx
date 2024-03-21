@@ -2,32 +2,28 @@ import { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
 
 import ReaderContainer from "@/src/components/reader/reader-container";
-import db from "@/src/services/db";
 import Highlight from "@/src/@types/highlight";
 import { ReaderProvider } from "@/src/context/ReaderContext";
+import { useStorage } from "@/src/context/StorageContext";
+import { Book } from "@/src/@types/book";
 
 export default function ReaderScreen({ bookId }: { bookId: string }) {
-  const [bookUri, setBookUri] = useState<string>("");
-  const [bookTitle, setBookTitle] = useState<string>("");
-  const [bookAuthor, setBookAuthor] = useState<string>("");
-  const [lastLocation, setLastLocation] = useState<string>("");
+  const storage = useStorage();
+  const [book, setBook] = useState<Book>({} as Book);
   const [highlights, setHighlights] = useState<Highlight[]>([]);
 
   useEffect(() => {
     const fetchBook = async () => {
-      const bookResponse = await db.getBook(bookId);
+      const bookResponse = await storage.actions.findOne("book", "id", bookId);
 
       if (!bookResponse) {
         alert("Error getting book");
         return;
       }
 
-      setBookUri(bookResponse.bookLocalUri);
-      setBookTitle(bookResponse.title);
-      setBookAuthor(bookResponse.author);
-      setLastLocation(bookResponse.lastLocation);
+      setBook(bookResponse);
 
-      const highlightsResponse = await db.getHighlights(bookId);
+      const highlightsResponse = await storage.actions.findMany("highlight", "bookId", bookId);
 
       if (!highlightsResponse) {
         alert("Error getting highlights");
@@ -44,11 +40,7 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
     <SafeAreaView style={styles.container}>
       <ReaderProvider>
         <ReaderContainer
-          bookId={bookId}
-          bookUri={bookUri}
-          title={bookTitle}
-          author={bookAuthor}
-          lastLocation={lastLocation}
+          book={book}
           highlights={highlights}
         />
       </ReaderProvider>
