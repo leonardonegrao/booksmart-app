@@ -159,7 +159,7 @@ async function saveContentLocally(zip: JSZip, fileName: string) {
   return folderUri;
 }
 
-function formatFileName(fileName: string) {
+export function formatFileName(fileName: string) {
   let formattedString = fileName.replace(/ /g, "_");
 
   formattedString = formattedString.toLowerCase();
@@ -171,7 +171,7 @@ function formatFileName(fileName: string) {
   return formattedString;
 }
 
-export default async function getMetadata(fileData: string, fileName: string) {
+export default async function loadBook(fileData: string, fileName: string) {
   try {
     const zip = await zipObj.loadAsync(fileData, { base64: true });
     const folderUri = await saveContentLocally(zip, formatFileName(fileName));
@@ -186,9 +186,6 @@ export default async function getMetadata(fileData: string, fileName: string) {
     const { coverImageDataBase64 } = await getCoverImageData(folderUri, coverImagePath, opfPath);
 
     const coverLocalPath = await saveImageLocally(coverImageDataBase64, metadata.title!);
-
-    console.log("folderUri", folderUri);
-    console.log("opfPath", opfPath);
 
     return {
       metadata,

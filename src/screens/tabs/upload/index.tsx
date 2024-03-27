@@ -9,10 +9,11 @@ import Text from "@/src/components/ui/text";
 import { useAuth } from "@/src/context/AuthContext";
 
 import api from "@/src/services/api";
-import getMetadata from "@/src/utils/getMetadata";
+import { useStorage } from "@/src/context/StorageContext";
 
 export default function UploadScreen() {
   const { authState } = useAuth();
+  const storage = useStorage();
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -23,14 +24,24 @@ export default function UploadScreen() {
 
   const [buttonLabel, setButtonLabel] = useState("Upload book");
 
-  const handleUpload = async (data: HandleUploadResponse) => {
+  const loadBook = async (data: HandleUploadResponse) => {
     setButtonLabel("Loading data, please wait");
 
     setFile(data);
 
-    const fileData = await FileSystem.readAsStringAsync(data.uri, { encoding: "base64" });
-
-    const { metadata, coverLocalPath, opfUri } = await getMetadata(fileData, data.name);
+    const { metadata, coverLocalPath, opfUri } = await storage.actions.saveBookFiles(data.uri, data.name);
+    
+    storage.actions.save("book", {
+      userId: authState!.userData.id!,
+      title: metadata.title || "",
+      author: metadata.author || "",
+      language: metadata.language || "",
+      coverLocalUri: coverLocalPath || "",
+      epubLocalUri: data.uri,
+      bookLocalUri: opfUri || "",
+      percentageRead: 0,
+      lastLocation: "",
+    });
     
     if (metadata.title)
       setTitle(metadata.title);
@@ -98,7 +109,7 @@ export default function UploadScreen() {
           instruction={file ? "Your file is ready" : "Select your .epub file"}
           fileTypes="application/epub+zip"
           value={file}
-          onChange={handleUpload}
+          onChange={loadBook}
         />
       </View>
     </View>

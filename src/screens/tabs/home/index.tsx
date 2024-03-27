@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 
-import api from "@/src/services/api";
-import { useAuth } from "@/src/context/AuthContext";
-import { Book } from "@/src/@types/book";
 import BooksList from "@/src/components/home/books-list";
 import EmptyState from "@/src/components/home/empty-state";
+
+import { useAuth } from "@/src/context/AuthContext";
+import { useStorage } from "@/src/context/StorageContext";
+
+import type { Book } from "@/src/@types/book";
 
 interface LibraryBooks {
   inProgress: Book[];
@@ -15,15 +17,16 @@ interface LibraryBooks {
 
 export default function HomeScreen() {
   const { authState } = useAuth();
+  const storage = useStorage();
   const [library, setLibrary] = useState<LibraryBooks>({ inProgress: [], finished: [], notStarted: []});
   const [isEmpty, setIsEmpty] = useState(false);
 
   const getBooks = async () => {
     try {
       if (authState?.userData.id) {
-        const result = await api.getBooks(authState!.userData.id);
+        const result = await storage.actions.getAll("book");
 
-        if (result.length === 0) {
+        if (!result || result.length === 0) {
           setIsEmpty(true);
           return;
         }
@@ -42,7 +45,6 @@ export default function HomeScreen() {
           } else {
             newLibraryState.inProgress.push(book);
           }
-
         });
 
         setLibrary(newLibraryState);

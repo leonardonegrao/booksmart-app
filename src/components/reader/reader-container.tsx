@@ -7,19 +7,15 @@ import { useReader } from "@/src/context/ReaderContext";
 
 import ReaderHeader from "./reader-header";
 import ReaderFooter from "./reader-footer";
-import api from "@/src/services/api";
-import db from "@/src/services/db";
 import Highlight from "@/src/@types/highlight";
 import ReaderWebView from "./web-view";
 import { useEffect } from "react";
 import template from "./web-view/template/template";
+import { useStorage } from "@/src/context/StorageContext";
+import { Book } from "@/src/@types/book";
 
 interface ReaderContainerProps {
-  bookId: string;
-  bookUri: string;
-  title: string;
-  author: string;
-  lastLocation: string;
+  book: Book;
   highlights: Highlight[];
 }
 
@@ -33,15 +29,9 @@ const getCalculatedDimensions = (topInset: number, bottomInset: number, windowHe
   };
 };
 
-export default function ReaderContainer({
-  bookId,
-  lastLocation,
-  bookUri,
-  title,
-  author,
-  highlights,
-}: ReaderContainerProps) {
+export default function ReaderContainer({ book, highlights }: ReaderContainerProps) {
   const reader = useReader();
+  const storage = useStorage();
   const templateUrl = `${FileSystem.documentDirectory}epub-reader.html`;
  
   const { height, width } = useWindowDimensions();
@@ -68,25 +58,27 @@ export default function ReaderContainer({
   }, []);
 
   const onBackPress = async () => {
-    await api.updateBookProgress(
-      bookId,
-      reader.data.progress,
-      reader.data.currentLocation.start.cfi
-    );
+    storage.actions.update("book", {
+      ...book,
+      lastLocation: reader.data.currentLocation.start.cfi,
+      percentageRead: reader.data.progress,
+    });
     router.navigate("/(tabs)/");
   };
 
-  const onSelected = async (contents: string, cfiRange: string, color: string) => {
-    const dbInstance = db.openDatabase();
-    
-    db.createHighlightsTable(dbInstance);
-    db.insertHighlight(dbInstance, bookId, cfiRange, color, contents);
+  const onSelected = async (contents: string, cfiRange: string, color: string) => {    
+    storage.actions.save("highlight", {
+      bookId: book.id,
+      location: cfiRange,
+      color,
+      content: contents,
+    });
   };
 
   return (
     <View style={{ width: "100%" }}>
-      <ReaderHeader title={title} author={author} onBackPress={onBackPress} />
-      {bookUri && (
+      <ReaderHeader title={book.title} author={book.author} onBackPress={onBackPress} />
+      {book.bookLocalUri && (
         <View style={{ padding: 40, height: (calculatedHeight + 80) }}>
           {reader.data.isLoading ? (
             <View
@@ -101,11 +93,11 @@ export default function ReaderContainer({
             </View>
           ) : (
             <ReaderWebView
-              src={bookUri}
+              src={book.bookLocalUri}
               templateUrl={templateUrl}
               height={calculatedHeight}
               width={calculatedWidth}
-              initialLocation={lastLocation}
+              initialLocation={book.lastLocation}
               highlights={highlights}
               theme={{ backgroundColor: "#FAFAFA", fontFamily: "Inter", fontSize: "16px", textColor: "#000000" }}
               onSelected={onSelected}
