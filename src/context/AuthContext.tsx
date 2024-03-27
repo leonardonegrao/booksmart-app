@@ -9,7 +9,7 @@ type RegisterInput = {
   fullname: string;
 }
 
-type UserData = {
+export type UserData = {
   id: string;
   email: string;
   fullname: string;
