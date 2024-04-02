@@ -1,29 +1,30 @@
-import type { SQLiteDatabase } from "expo-sqlite";
-import type { Book } from "./book";
+import type { Collection, Database } from "@nozbe/watermelondb";
 import type Highlight from "./highlight";
+import BookModel from "../services/db/model/book";
+import HighlightModel from "../services/db/model/highlight";
 
 // Database actions
 
 export interface CreateTableInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: string;
   fields: { key: string; type: string }[];
 }
 
 export interface DropTableInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: "books" | "highlights";
 }
 
 export interface InsertRowInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: "books" | "highlights";
   fields: string[];
   values: any[];
 }
 
 export interface UpdateRowInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: "books" | "highlights";
   fields: string[];
   values: any[];
@@ -31,7 +32,7 @@ export interface UpdateRowInput {
 }
 
 export interface GetAllInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: "books" | "highlights";
 }
 
@@ -76,7 +77,7 @@ export interface DataTypeMap {
 export type DataType = keyof DataTypeMap;
 
 export interface StorageProps {
-  db: SQLiteDatabase | null;
+  db: Database | null;
   actions: {
     saveBookFiles: (uri: string, name: string) => Promise<{
       metadata: {
@@ -89,13 +90,13 @@ export interface StorageProps {
       folderUri: string;
       opfUri: string;
     }>;
-    save: <T extends DataType>(type: T, data: DataTypeMap[T]) => void;
-    update: <T extends DataType>(type: T, data: DataTypeMap[T]) => void;
-    remove: <T extends DataType>(type: T, id: string) => void;
-    getAll: <T extends keyof DataTypeMap>(type: T) => Promise<Book[]> | undefined;
-    findMany: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<Highlight[]> | undefined;
-    findOne: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<Book> | undefined;
-    drop: <T extends keyof DataTypeMap>(type: T) => {
+    save: <T extends DataType>(type: T, data: DataTypeMap[T]) => Promise<BookModel | HighlightModel | { error: string } | undefined>;
+    update?: <T extends DataType>(type: T, data: DataTypeMap[T]) => void;
+    remove?: <T extends DataType>(type: T, id: string) => void;
+    getAll: <T extends keyof DataTypeMap>(type: T) => Promise<Collection<BookModel> | undefined>;
+    findMany?: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<Highlight[]> | undefined;
+    findOne: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<BookModel | undefined>;
+    drop?: <T extends keyof DataTypeMap>(type: T) => {
       error: string;
     } | undefined;
   };

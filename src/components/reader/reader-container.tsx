@@ -58,11 +58,11 @@ export default function ReaderContainer({ book, highlights }: ReaderContainerPro
   }, []);
 
   const onBackPress = async () => {
-    storage.actions.update("book", {
-      ...book,
-      lastLocation: reader.data.currentLocation.start.cfi,
-      percentageRead: reader.data.progress,
-    });
+    // storage.actions.update("book", {
+    //   ...book,
+    //   lastLocation: reader.data.currentLocation.start.cfi,
+    //   percentageRead: reader.data.progress,
+    // });
     router.navigate("/(tabs)/");
   };
 

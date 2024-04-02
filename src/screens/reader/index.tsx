@@ -23,14 +23,14 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
 
       setBook(bookResponse);
 
-      const highlightsResponse = await storage.actions.findMany("highlight", "bookId", bookId);
+      // const highlightsResponse = await storage.actions.findMany("highlight", "bookId", bookId);
 
-      if (!highlightsResponse) {
-        alert("Error getting highlights");
-        return;
-      }
+      // if (!highlightsResponse) {
+      //   alert("Error getting highlights");
+      //   return;
+      // }
 
-      setHighlights(highlightsResponse);
+      // setHighlights(highlightsResponse);
     };
 
     fetchBook();

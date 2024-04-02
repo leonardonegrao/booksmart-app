@@ -1,177 +1,48 @@
-import * as SQLite from "expo-sqlite";
-import * as dbActions from "./db-actions";
+import { Database } from "@nozbe/watermelondb";
+import { database } from "./model";
 
-import type { SQLiteDatabase } from "expo-sqlite";
 import type { InsertBookInput, InsertHighlightInput } from "@/src/@types/storage";
-import type { Book } from "@/src/@types/book";
-import type Highlight from "@/src/@types/highlight";
+import BookModel from "./model/book";
+import HighlightModel from "./model/highlight";
 
-const database = {
+export default {
   openDatabase: () => {
-    const db = SQLite.openDatabase("booksmart.db");
-    return db;
+    return database;
   },
   books: {
-    createTable: (db: SQLiteDatabase) => {
-      return dbActions.createTable({
-        db,
-        tableName: "books",
-        fields: [
-          { key: "id", type: "TEXT" },
-          { key: "userId", type: "TEXT" },
-          { key: "bookBucketKey", type: "TEXT" },
-          { key: "bookLocalUri", type: "TEXT" },
-          { key: "epubLocalUri", type: "TEXT" },
-          { key: "coverBucketKey", type: "TEXT" },
-          { key: "coverLocalUri", type: "TEXT" },
-          { key: "title", type: "TEXT" },
-          { key: "author", type: "TEXT" },
-          { key: "percentageRead", type: "INTEGER" },
-          { key: "lastLocation", type: "TEXT" },
-          { key: "language", type: "TEXT" },
-        ],
+    insert: async (db: Database, bookData: InsertBookInput) => {
+      const newBook = await db.get<BookModel>("books").create(book => {
+        book.bookBucketKey = bookData.bookBucketKey;
+        book.coverBucketKey = bookData.coverBucketKey;
+        book.title = bookData.title;
+        book.author = bookData.author;
+        book.percentageRead = bookData.percentageRead;
+        book.lastLocation = bookData.lastLocation;
+        book.language = bookData.language;
       });
+
+      return newBook;
     },
-    dropTable: (db: SQLiteDatabase) => {
-      return dbActions.dropTable({ db, tableName: "books" });
+    update: () => {},
+    delete: () => {},
+    getAll: async (db: Database) => {
+      return db.get<BookModel>("books");
     },
-    insert: (db: SQLiteDatabase, bookData: InsertBookInput) => {
-      return dbActions.insertRow({
-        db,
-        tableName: "books",
-        fields: [
-          "id",
-          "userId",
-          "bookBucketKey",
-          "bookLocalUri",
-          "epubLocalUri",
-          "coverBucketKey",
-          "coverLocalUri",
-          "title",
-          "author",
-          "percentageRead",
-          "lastLocation",
-          "language",
-        ],
-        values: [
-          bookData.id,
-          bookData.userId,
-          "",
-          bookData.bookLocalUri,
-          bookData.epubLocalUri,
-          "",
-          bookData.coverLocalUri,
-          bookData.title,
-          bookData.author,
-          bookData.percentageRead,
-          bookData.lastLocation,
-          bookData.language,
-        ],
-      });
-    },
-    update: (db: SQLiteDatabase, bookData: InsertBookInput) => {
-      return dbActions.updateRow({
-        db,
-        tableName: "books",
-        fields: [
-          "id",
-          "userId",
-          "bookBucketKey",
-          "bookLocalUri",
-          "epubLocalUri",
-          "coverBucketKey",
-          "coverLocalUri",
-          "title",
-          "author",
-          "percentageRead",
-          "lastLocation",
-          "language",
-        ],
-        values: [
-          bookData.id,
-          bookData.userId,
-          bookData.bookBucketKey,
-          bookData.bookLocalUri,
-          bookData.epubLocalUri,
-          bookData.coverBucketKey,
-          bookData.coverLocalUri,
-          bookData.title,
-          bookData.author,
-          bookData.percentageRead,
-          bookData.lastLocation,
-          bookData.language,
-        ],
-        id: bookData.id,
-      });
-    },
-    delete: (db: SQLiteDatabase, bookId: string) => {
-      return dbActions.deleteRow({
-        db,
-        tableName: "books",
-        fieldFilter: "id",
-        valueFilter: bookId,
-      });
-    },
-    getAll: (db: SQLiteDatabase) => {
-      return dbActions.getAll<Book>({ db, tableName: "books" });
-    },
-    findOne: (db: SQLiteDatabase, bookId: string) => {
-      return dbActions.getOne<Book>({
-        db,
-        tableName: "books",
-        fieldFilter: "id",
-        valueFilter: bookId,
-      });
+    findOne: async (db: Database, bookId: string) => {
+      return db.get<BookModel>("books").find(bookId);
     },
   },
   highlights: {
-    createTable: (db: SQLiteDatabase) => {
-      return dbActions.createTable({
-        db,
-        tableName: "highlights",
-        fields: [
-          { key: "id", type: "TEXT" },
-          { key: "bookId", type: "TEXT" },
-          { key: "location", type: "TEXT" },
-          { key: "color", type: "TEXT" },
-          { key: "content", type: "TEXT" },
-        ],
+    insert: async (db: Database, highlightData: InsertHighlightInput) => {
+      const newHighlight = await db.get<HighlightModel>("highlights").create(highlight => {
+        highlight.location = highlightData.location;
+        highlight.color = highlightData.color;
+        highlight.content = highlightData.content;
+        highlight.bookId = highlightData.bookId;
       });
+
+      return newHighlight;
     },
-    dropTable: (db: SQLiteDatabase) => {
-      return dbActions.dropTable({ db, tableName: "highlights" });
-    },
-    insert: (db: SQLiteDatabase, highlightData: InsertHighlightInput) => {
-      return dbActions.insertRow({
-        db,
-        tableName: "highlights",
-        fields: ["id", "bookId", "location", "color", "content"],
-        values: [
-          `${highlightData.bookId}-${highlightData.location}`,
-          highlightData.bookId,
-          highlightData.location,
-          highlightData.color,
-          highlightData.content,
-        ],
-      });
-    },
-    delete: (db: SQLiteDatabase, highlightId: string) => {
-      return dbActions.deleteRow({
-        db,
-        tableName: "highlights",
-        fieldFilter: "id",
-        valueFilter: highlightId,
-      });
-    },
-    getAllFromBook: (db: SQLiteDatabase, bookId: string) => {
-      return dbActions.getMany<Highlight>({
-        db,
-        tableName: "highlights",
-        fieldFilter: "bookId",
-        valueFilter: bookId,
-      });
-    },
+    delete: () => {},
   },
 };
-
-export default database;

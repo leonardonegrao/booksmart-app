@@ -1,7 +1,6 @@
 export interface Book {
   id: string;
   userId: string;
-  filename: string;
   bookBucketKey: string;
   bookLocalUri: string;
   epubLocalUri: string;
