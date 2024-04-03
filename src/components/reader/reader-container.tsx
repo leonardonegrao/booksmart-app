@@ -58,16 +58,16 @@ export default function ReaderContainer({ book, highlights }: ReaderContainerPro
   }, []);
 
   const onBackPress = async () => {
-    // storage.actions.update("book", {
-    //   ...book,
-    //   lastLocation: reader.data.currentLocation.start.cfi,
-    //   percentageRead: reader.data.progress,
-    // });
+    await storage.actions.books.update(storage.db!, {
+      id: book.id,
+      lastLocation: reader.data.currentLocation.start.cfi,
+      percentageRead: reader.data.progress,
+    });
     router.navigate("/(tabs)/");
   };
 
   const onSelected = async (contents: string, cfiRange: string, color: string) => {    
-    storage.actions.save("highlight", {
+    await storage.actions.highlights.insert(storage.db!, {
       bookId: book.id,
       location: cfiRange,
       color,

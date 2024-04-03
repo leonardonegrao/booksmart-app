@@ -1,7 +1,5 @@
-import type { Collection, Database } from "@nozbe/watermelondb";
-import type Highlight from "./highlight";
-import BookModel from "../services/db/model/book";
-import HighlightModel from "../services/db/model/highlight";
+import type { Database } from "@nozbe/watermelondb";
+import { DatabaseService } from "../services/db";
 
 // Database actions
 
@@ -46,7 +44,6 @@ export interface GetOneInput extends GetManyInput {}
 // DB service
 
 export interface InsertBookInput {
-  id: string;
   userId: string;
   bookBucketKey?: string;
   coverBucketKey?: string;
@@ -58,6 +55,10 @@ export interface InsertBookInput {
   epubLocalUri: string;
   lastLocation: string;
   coverLocalUri: string;
+}
+
+export interface UpdateBookInput extends Partial<InsertBookInput> {
+  id: string;
 }
 
 export interface InsertHighlightInput {
@@ -76,28 +77,20 @@ export interface DataTypeMap {
 
 export type DataType = keyof DataTypeMap;
 
+export interface StorageActions extends DatabaseService {
+  saveBookFiles: (uri: string, name: string) => Promise<{
+    metadata: {
+        title: string | null | undefined;
+        author: string | null | undefined;
+        language: string | null | undefined;
+    };
+    coverImagePath: string;
+    coverLocalPath: string;
+    folderUri: string;
+    opfUri: string}>;
+}
+
 export interface StorageProps {
   db: Database | null;
-  actions: {
-    saveBookFiles: (uri: string, name: string) => Promise<{
-      metadata: {
-          title: string | null | undefined;
-          author: string | null | undefined;
-          language: string | null | undefined;
-      };
-      coverImagePath: string;
-      coverLocalPath: string;
-      folderUri: string;
-      opfUri: string;
-    }>;
-    save: <T extends DataType>(type: T, data: DataTypeMap[T]) => Promise<BookModel | HighlightModel | { error: string } | undefined>;
-    update?: <T extends DataType>(type: T, data: DataTypeMap[T]) => void;
-    remove?: <T extends DataType>(type: T, id: string) => void;
-    getAll: <T extends keyof DataTypeMap>(type: T) => Promise<Collection<BookModel> | undefined>;
-    findMany?: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<Highlight[]> | undefined;
-    findOne: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<BookModel | undefined>;
-    drop?: <T extends keyof DataTypeMap>(type: T) => {
-      error: string;
-    } | undefined;
-  };
+  actions: StorageActions;
 }

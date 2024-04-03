@@ -49,9 +49,9 @@ export default function FileInput({ title, instruction, fileTypesLabel, fileType
 
       setState("uploaded");
     } catch (e) {
+      console.log(e);
       setState("error");
     }
-
   };
 
   return (

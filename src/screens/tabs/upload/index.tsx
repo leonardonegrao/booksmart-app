@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import * as FileSystem from "expo-file-system";
 
 import Button from "@/src/components/ui/button";
 import Input from "@/src/components/ui/input";
@@ -29,9 +28,12 @@ export default function UploadScreen() {
 
     setFile(data);
 
-    const { metadata, coverLocalPath, opfUri } = await storage.actions.saveBookFiles(data.uri, data.name);
+    const { metadata, coverLocalPath, opfUri } = await storage.actions.saveBookFiles(
+      data.uri,
+      data.name
+    );
     
-    storage.actions.save("book", {
+    await storage.actions.books.insert(storage.db!, {
       userId: authState!.userData.id!,
       title: metadata.title || "",
       author: metadata.author || "",

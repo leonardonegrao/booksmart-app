@@ -14,7 +14,7 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
 
   useEffect(() => {
     const fetchBook = async () => {
-      const bookResponse = await storage.actions.findOne("book", "id", bookId);
+      const bookResponse = await storage.actions.books.findOne(storage.db!, bookId);
 
       if (!bookResponse) {
         alert("Error getting book");
@@ -22,15 +22,6 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
       }
 
       setBook(bookResponse);
-
-      // const highlightsResponse = await storage.actions.findMany("highlight", "bookId", bookId);
-
-      // if (!highlightsResponse) {
-      //   alert("Error getting highlights");
-      //   return;
-      // }
-
-      // setHighlights(highlightsResponse);
     };
 
     fetchBook();
