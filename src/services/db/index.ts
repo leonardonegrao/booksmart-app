@@ -10,7 +10,7 @@ export interface DatabaseService {
   books: {
     insert: (db: Database, bookData: InsertBookInput) => Promise<BookModel>;
     update: (db: Database, bookData: UpdateBookInput) => Promise<BookModel>;
-    delete: () => void;
+    delete: (db: Database, bookId: string) => Promise<void>;
     getAll: (db: Database) => Promise<Collection<BookModel>>;
     findOne: (db: Database, bookId: string) => Promise<BookModel>;
   };
@@ -69,7 +69,13 @@ const databaseService: DatabaseService = {
 
       return updatedBook;
     },
-    delete: () => {},
+    delete: async (db: Database, bookId: string) => {
+      const book = await db.get<BookModel>("books").find(bookId);
+
+      await db.write(async () => {
+        await book.destroyPermanently();
+      });
+    },
     getAll: async (db: Database) => {
       return db.get<BookModel>("books");
     },
