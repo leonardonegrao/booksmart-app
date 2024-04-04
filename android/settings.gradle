@@ -1,4 +1,4 @@
-rootProject.name = 'booksmart-app'
+rootProject.name = 'booksmartapp'
 
 dependencyResolutionManagement {
   versionCatalogs {

@@ -4,11 +4,11 @@
     "slug": "booksmart-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./src/assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash/splash.png",
+      "image": "./src/assets/images/splash.png",
       "resizeMode": "cover",
       "backgroundColor": "#FD7900"
     },
