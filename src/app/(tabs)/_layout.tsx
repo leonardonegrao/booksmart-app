@@ -1,40 +1,12 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { Redirect, Slot, router } from "expo-router";
-import { Pressable } from "react-native";
-
+import React from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { BookmarkIcon, LibraryIcon, SettingsIcon, UploadBookIcon } from "@/src/components/icons";
+import { StyleSheet, Text } from "react-native";
+import { Redirect, Slot } from "expo-router";
+
 import { useAuth } from "@/src/context/AuthContext";
-
-type Tab = "library" | "upload" | "history" | "settings"
-
-const tabList = [
-  { id: "library", label: "Library", href: "/", icon: LibraryIcon },
-  { id: "upload", label: "Upload", href: "/upload", icon: UploadBookIcon },
-  { id: "history", label: "History", href: "/history", icon: BookmarkIcon },
-  { id: "settings", label: "Settings", href: "/settings", icon: SettingsIcon },
-];
-
-function TabItem({ children, label, isActive }: { children: React.ReactNode; label: string; isActive: boolean; }) {
-  return (
-    <View style={styles.tab}>
-      {children}
-      <Text
-        style={{
-          ...styles.tabLabel,
-          color: isActive ? "#FF9D42" : "#939393",
-          fontFamily: isActive ? "sans-semibold" : "sans-regular",
-        }}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-}
+import NavTabs from "@/src/components/tabs/nav-tabs";
 
 export default function TabLayout() {
-  const [activeTab, setActiveTab] = useState<Tab>("library");
   const { authState } = useAuth();
   const isLoading = authState?.authenticated === null;
 
@@ -46,35 +18,11 @@ export default function TabLayout() {
     return <Redirect href="/login" />;
   }
 
-  const handleTabPress = (tab: Tab) => {
-    setActiveTab(tab);
-    
-    if (tab === "library")
-      router.push("/(tabs)/");
-    else if (tab === "settings")
-      router.push("/(tabs)/settings");
-    else
-      router.push("/(tabs)/upload");
-  };
-
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.layout}>
         <Slot />
-        <View style={styles.tabsContainer}>
-          <View style={styles.tabs}>
-            {tabList.map(({ id, label, icon }) => (
-              <Pressable key={id} onPress={() => handleTabPress(id as Tab)} style={styles.tabContainer}>
-                <TabItem label={label} isActive={activeTab === id}>
-                    {icon({
-                      color: activeTab === id ? "#FF9D42" : "#939393",
-                      strokeWidth: activeTab === id ? 1.5 : 1.0,
-                    })}
-                </TabItem>
-              </Pressable>
-            ))}
-          </View>
-        </View>
+        <NavTabs />
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -86,35 +34,5 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     height: "100%",
     backgroundColor: "#FAFAFA",
-  },
-  tabsContainer: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    flex: 1,
-    gap: 16,
-    paddingBottom: 24,
-    backgroundColor: "#FAFAFA",
-  },
-  tabs: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 8,
-    height: 56,
-    borderTopWidth: 1.5,
-    borderColor: "#3F3F3F0A",
-  },
-  tabContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-  tab: {
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 4,
-  },
-  tabLabel: {
-    fontSize: 12,
   },
 });

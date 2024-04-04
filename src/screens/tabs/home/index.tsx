@@ -5,9 +5,6 @@ import { withObservables } from "@nozbe/watermelondb/react";
 import BooksList from "@/src/components/home/books-list";
 import EmptyState from "@/src/components/home/empty-state";
 
-import { useAuth } from "@/src/context/AuthContext";
-import { useStorage } from "@/src/context/StorageContext";
-
 import type { Book } from "@/src/@types/book";
 import BookModel from "@/src/services/db/model/book";
 import { database } from "@/src/services/db/model";
@@ -23,8 +20,6 @@ interface LibraryBooks {
 }
 
 function HomeScreen({ books }: HomeScreenProps) {
-  const { authState } = useAuth();
-  const storage = useStorage();
   const [library, setLibrary] = useState<LibraryBooks>({ inProgress: [], finished: [], notStarted: []});
   const [isEmpty, setIsEmpty] = useState(false);
 
