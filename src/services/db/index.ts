@@ -85,11 +85,13 @@ const databaseService: DatabaseService = {
   },
   highlights: {
     insert: async (db: Database, highlightData: InsertHighlightInput) => {
-      const newHighlight = await db.get<HighlightModel>("highlights").create(highlight => {
-        highlight.location = highlightData.location;
-        highlight.color = highlightData.color;
-        highlight.content = highlightData.content;
-        highlight.bookId = highlightData.bookId;
+      const newHighlight = await db.write(async () => {
+        return db.get<HighlightModel>("highlights").create(highlight => {
+          highlight.location = highlightData.location;
+          highlight.color = highlightData.color;
+          highlight.content = highlightData.content;
+          highlight.book.id = highlightData.bookId;
+        });
       });
 
       return newHighlight;

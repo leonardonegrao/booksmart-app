@@ -15,7 +15,7 @@ export default class HighlightModel extends Model {
   // @ts-expect-error - ignore "any" error
   @text("content") content;
   // @ts-expect-error - ignore "any" error
-  @immutableRelation("books", "book_id") bookId;
+  @immutableRelation("books", "book_id") book;
   // @ts-expect-error - ignore "any" error
   @date("created_at") createdAt;
   // @ts-expect-error - ignore "any" error
