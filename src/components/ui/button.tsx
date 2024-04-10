@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import type { Href } from "expo-router";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from "react-native";
 import type { GestureResponderEvent } from "react-native";
@@ -12,27 +12,21 @@ interface ButtonProps {
 }
 
 export default function Button({ label, onPress, state = "default", href }: ButtonProps) {
-  if (href) {
-    return (
-      <TouchableOpacity
-        style={state !== "default" ? { ...styles.button, ...styles.disabled } : styles.button}
-        onPress={onPress}
-      >
-        <Link href={href}>
-          <Text
-            style={state !== "default" ? { ...styles.label, ...styles.labelDisabled } : styles.label}
-          >
-            {label}
-          </Text>
-        </Link>
-      </TouchableOpacity>
-    );
-  }
+
+  const onPressHandler = (e: GestureResponderEvent) => {
+    if (href) {
+      router.push(href);
+    }
+
+    if (onPress) {
+      onPress(e);
+    }
+  };
 
   return (
     <TouchableOpacity
       style={state !== "default" ? { ...styles.button, ...styles.disabled } : styles.button}
-      onPress={onPress}
+      onPress={onPressHandler}
     >
       {state === "loading" ? (
         <ActivityIndicator color="#939393" />

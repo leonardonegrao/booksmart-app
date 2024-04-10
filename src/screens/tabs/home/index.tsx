@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
+import { withObservables } from "@nozbe/watermelondb/react";
 
 import BooksList from "@/src/components/home/books-list";
 import EmptyState from "@/src/components/home/empty-state";
 
-import { useAuth } from "@/src/context/AuthContext";
-import { useStorage } from "@/src/context/StorageContext";
-
 import type { Book } from "@/src/@types/book";
+import BookModel from "@/src/services/db/model/book";
+import { database } from "@/src/services/db/model";
+
+interface HomeScreenProps {
+  books: BookModel[];
+}
 
 interface LibraryBooks {
   inProgress: Book[];
@@ -15,47 +19,21 @@ interface LibraryBooks {
   notStarted: Book[];
 }
 
-export default function HomeScreen() {
-  const { authState } = useAuth();
-  const storage = useStorage();
+function HomeScreen({ books }: HomeScreenProps) {
   const [library, setLibrary] = useState<LibraryBooks>({ inProgress: [], finished: [], notStarted: []});
   const [isEmpty, setIsEmpty] = useState(false);
 
-  const getBooks = async () => {
-    try {
-      if (authState?.userData.id) {
-        const result = await storage.actions.getAll("book");
-
-        if (!result || result.length === 0) {
-          setIsEmpty(true);
-          return;
-        }
-
-        const newLibraryState: LibraryBooks = {
-          inProgress: [],
-          finished: [],
-          notStarted: [],
-        };
-
-        result.forEach((book: Book) => {
-          if (book.percentageRead === 0) {
-            newLibraryState.notStarted.push(book);
-          } else if (book.percentageRead === 100) {
-            newLibraryState.finished.push(book);
-          } else {
-            newLibraryState.inProgress.push(book);
-          }
-        });
-
-        setLibrary(newLibraryState);
-      }
-    } catch (e) {
-      alert("An error occurred while trying to fetch the books");
-    }
-  };
-
   useEffect(() => {
-    getBooks();
+    if (books.length === 0) {
+      setIsEmpty(true);
+      return;
+    }
+
+    const inProgress = books.filter((book) => book.percentageRead > 0 && book.percentageRead < 100);
+    const finished = books.filter((book) => book.percentageRead === 100);
+    const notStarted = books.filter((book) => book.percentageRead === 0);
+
+    setLibrary({ inProgress, finished, notStarted });
   }, []);
 
   return (
@@ -87,6 +65,13 @@ export default function HomeScreen() {
     </View>
   );
 }
+
+const enhance = withObservables([], () => ({
+  books: database.collections.get<BookModel>("books").query().observe(),
+}));
+
+const EnhancedHomeScreen = enhance(HomeScreen);
+export default EnhancedHomeScreen;
 
 const styles = StyleSheet.create({
   container: {

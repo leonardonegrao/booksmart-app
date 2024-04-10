@@ -1,29 +1,28 @@
-import type { SQLiteDatabase } from "expo-sqlite";
-import type { Book } from "./book";
-import type Highlight from "./highlight";
+import type { Database } from "@nozbe/watermelondb";
+import { DatabaseService } from "../services/db";
 
 // Database actions
 
 export interface CreateTableInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: string;
   fields: { key: string; type: string }[];
 }
 
 export interface DropTableInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: "books" | "highlights";
 }
 
 export interface InsertRowInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: "books" | "highlights";
   fields: string[];
   values: any[];
 }
 
 export interface UpdateRowInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: "books" | "highlights";
   fields: string[];
   values: any[];
@@ -31,7 +30,7 @@ export interface UpdateRowInput {
 }
 
 export interface GetAllInput {
-  db: SQLiteDatabase;
+  db: Database;
   tableName: "books" | "highlights";
 }
 
@@ -45,7 +44,6 @@ export interface GetOneInput extends GetManyInput {}
 // DB service
 
 export interface InsertBookInput {
-  id: string;
   userId: string;
   bookBucketKey?: string;
   coverBucketKey?: string;
@@ -57,6 +55,10 @@ export interface InsertBookInput {
   epubLocalUri: string;
   lastLocation: string;
   coverLocalUri: string;
+}
+
+export interface UpdateBookInput extends Partial<InsertBookInput> {
+  id: string;
 }
 
 export interface InsertHighlightInput {
@@ -75,28 +77,20 @@ export interface DataTypeMap {
 
 export type DataType = keyof DataTypeMap;
 
+export interface StorageActions extends DatabaseService {
+  saveBookFiles: (uri: string, name: string) => Promise<{
+    metadata: {
+        title: string | null | undefined;
+        author: string | null | undefined;
+        language: string | null | undefined;
+    };
+    coverImagePath: string;
+    coverLocalPath: string;
+    folderUri: string;
+    opfUri: string}>;
+}
+
 export interface StorageProps {
-  db: SQLiteDatabase | null;
-  actions: {
-    saveBookFiles: (uri: string, name: string) => Promise<{
-      metadata: {
-          title: string | null | undefined;
-          author: string | null | undefined;
-          language: string | null | undefined;
-      };
-      coverImagePath: string;
-      coverLocalPath: string;
-      folderUri: string;
-      opfUri: string;
-    }>;
-    save: <T extends DataType>(type: T, data: DataTypeMap[T]) => void;
-    update: <T extends DataType>(type: T, data: DataTypeMap[T]) => void;
-    remove: <T extends DataType>(type: T, id: string) => void;
-    getAll: <T extends keyof DataTypeMap>(type: T) => Promise<Book[]> | undefined;
-    findMany: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<Highlight[]> | undefined;
-    findOne: <T extends keyof DataTypeMap>(type: T, field: string, value: string | number) => Promise<Book> | undefined;
-    drop: <T extends keyof DataTypeMap>(type: T) => {
-      error: string;
-    } | undefined;
-  };
+  db: Database | null;
+  actions: StorageActions;
 }

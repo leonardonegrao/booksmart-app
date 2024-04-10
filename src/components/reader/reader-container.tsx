@@ -58,8 +58,8 @@ export default function ReaderContainer({ book, highlights }: ReaderContainerPro
   }, []);
 
   const onBackPress = async () => {
-    storage.actions.update("book", {
-      ...book,
+    await storage.actions.books.update(storage.db!, {
+      id: book.id,
       lastLocation: reader.data.currentLocation.start.cfi,
       percentageRead: reader.data.progress,
     });
@@ -67,7 +67,7 @@ export default function ReaderContainer({ book, highlights }: ReaderContainerPro
   };
 
   const onSelected = async (contents: string, cfiRange: string, color: string) => {    
-    storage.actions.save("highlight", {
+    await storage.actions.highlights.insert(storage.db!, {
       bookId: book.id,
       location: cfiRange,
       color,

@@ -1,10 +1,13 @@
 import { StorageProvider } from "@/src/context/StorageContext";
+import { SyncProvider } from "@/src/context/SyncContext";
 import UploadScreen from "@/src/screens/tabs/upload";
 
 export default function Upload() {
   return (
     <StorageProvider>
-      <UploadScreen />
+      <SyncProvider>
+        <UploadScreen />
+      </SyncProvider>
     </StorageProvider>
   );
 }

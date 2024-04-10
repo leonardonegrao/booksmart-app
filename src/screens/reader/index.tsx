@@ -6,6 +6,7 @@ import Highlight from "@/src/@types/highlight";
 import { ReaderProvider } from "@/src/context/ReaderContext";
 import { useStorage } from "@/src/context/StorageContext";
 import { Book } from "@/src/@types/book";
+import HighlightModel from "@/src/services/db/model/highlight";
 
 export default function ReaderScreen({ bookId }: { bookId: string }) {
   const storage = useStorage();
@@ -14,7 +15,17 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
 
   useEffect(() => {
     const fetchBook = async () => {
-      const bookResponse = await storage.actions.findOne("book", "id", bookId);
+      const bookResponse = await storage.actions.books.findOne(storage.db!, bookId);
+      const highlightsResponse = await bookResponse.highlights.fetch();
+      const formattedHighlights = highlightsResponse.map((hl: HighlightModel) => {
+        return {
+          id: hl.id,
+          bookId: bookResponse.id,
+          color: hl.color,
+          location: hl.location,
+          content: hl.content,
+        };
+      });
 
       if (!bookResponse) {
         alert("Error getting book");
@@ -22,15 +33,7 @@ export default function ReaderScreen({ bookId }: { bookId: string }) {
       }
 
       setBook(bookResponse);
-
-      const highlightsResponse = await storage.actions.findMany("highlight", "bookId", bookId);
-
-      if (!highlightsResponse) {
-        alert("Error getting highlights");
-        return;
-      }
-
-      setHighlights(highlightsResponse);
+      setHighlights(formattedHighlights);
     };
 
     fetchBook();
