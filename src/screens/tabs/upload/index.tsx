@@ -2,28 +2,26 @@ import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import Button from "@/src/components/ui/button";
-import Input from "@/src/components/ui/input";
-import FileInput, { HandleUploadResponse } from "@/src/components/ui/file-input";
+import FileInput from "@/src/components/ui/file-input";
 import Text from "@/src/components/ui/text";
 import { useAuth } from "@/src/context/AuthContext";
 
-import api from "@/src/services/api";
 import { useStorage } from "@/src/context/StorageContext";
+import { FileData } from "@/src/@types/sync";
+import { useSync } from "@/src/context/SyncContext";
+import BookModel from "@/src/services/db/model/book";
 
 export default function UploadScreen() {
   const { authState } = useAuth();
+  const sync = useSync();
   const storage = useStorage();
 
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [language, setLanguage] = useState("");
-  const [file, setFile] = useState<HandleUploadResponse | null>(null);
-  const [folder, setFolder] = useState("");
-  const [coverLocalPath, setCoverLocalPath] = useState<string | null>("");
+  const [createdBook, setCreatedBook] = useState<BookModel>({} as BookModel);
+  const [file, setFile] = useState<FileData | null>(null);
 
   const [buttonLabel, setButtonLabel] = useState("Upload book");
 
-  const loadBook = async (data: HandleUploadResponse) => {
+  const loadBook = async (data: FileData) => {
     setButtonLabel("Loading data, please wait");
 
     setFile(data);
@@ -33,7 +31,7 @@ export default function UploadScreen() {
       data.name
     );
     
-    await storage.actions.books.insert(storage.db!, {
+    const createdBook = await storage.actions.books.insert(storage.db!, {
       userId: authState!.userData.id!,
       title: metadata.title || "",
       author: metadata.author || "",
@@ -44,41 +42,31 @@ export default function UploadScreen() {
       percentageRead: 0,
       lastLocation: "",
     });
-    
-    if (metadata.title)
-      setTitle(metadata.title);
-    if (metadata.author)
-      setAuthor(metadata.author);
-    if (metadata.language)
-      setLanguage(metadata.language);
-    if (coverLocalPath)
-      setCoverLocalPath(coverLocalPath);
-    if (opfUri)
-      setFolder(opfUri); // TODO: save here the actual folderUri, and add new logic to save the opfUri
 
+    setCreatedBook(createdBook);
     setButtonLabel("Upload book");
   };
 
-  const handleSaveBook = async () => {
+  const handleSyncBook = async () => {
     if (!file) return;
+    if (!sync.isSyncEnabled) return;
 
     setButtonLabel("Uploading you book to the cloud, this may take a while");
+
+    if (!createdBook) return;
     
-    const response = await api.createBook({
-      title,
-      author,
-      language,
-      file,
+    await sync.actions.registerBook({
+      id: createdBook.id,
       name: file.name.split(".")[0],
       userId: authState!.userData.id!,
-      coverLocalPath: coverLocalPath!,
-      folder,
+      author: createdBook.author,
+      title: createdBook.title,
+      language: createdBook.language,
+      coverLocalUri: createdBook.coverLocalUri,
+      percentageRead: 0,
+      lastLocation: "",
+      file,
     });
-
-    if (response.status === "error") {
-      alert(`An error occurred while trying to upload your book: ${response.message}`, );
-      return;
-    }
 
     setButtonLabel("Book uploaded");
   };
@@ -97,12 +85,9 @@ export default function UploadScreen() {
 
       <View style={styles.metadataSection}>
         <View style={{ gap: 8 }}>
-          <Input placeholder="Title" value={title} onChangeText={(text) => setTitle(text)} />
-          <Input placeholder="Author" value={author} onChangeText={(text) => setAuthor(text)} />
-          <Input placeholder="Language" value={language} onChangeText={(text) => setLanguage(text)} />
         </View>
 
-        <Button label={buttonLabel} onPress={handleSaveBook} />
+        <Button label={buttonLabel} onPress={handleSyncBook} />
       </View>
 
       <View style={{ width: "100%" }}>

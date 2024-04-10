@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import ky from "ky";
 import * as SecureStore from "expo-secure-store";
 
 type RegisterInput = {
@@ -20,6 +20,12 @@ type AuthenticationData = {
   token: string | null;
   authenticated: boolean | null;
   userData: UserData | Record<string, never>;
+}
+
+interface LoginApiResponse extends UserData {
+  error?: string;
+  message: string;
+  accessToken: string;
 }
 
 interface AuthProps {
@@ -53,8 +59,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const userData = await SecureStore.getItemAsync("userData");
 
       if (token) {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
         setAuthState({
           token,
           authenticated: true,
@@ -76,43 +80,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const register = async (input: RegisterInput) => {
     try {
-      return await axios.post(`${API_URL}/users`, input);
+      return await ky.post(`${API_URL}/users`, { json: input }).json();
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return { error: true, message: (e as any).response.data.message };
+      return { error: true, message: (e as any).response.message };
     }
   };
   
   const login = async (email: string, password: string) => {
     try {
-      const result = await axios.post(`${API_URL}/users/login`, { email, password });
+      const result = await ky.post(`${API_URL}/users/login`, { json: { email, password } })
+        .json<LoginApiResponse>();
 
-      if (result.data.error) {
-        return { error: true, message: result.data.message };
+      if (result.error) {
+        return { error: true, message: result.message };
       }
 
       const userData = {
-        email: result.data.email,
-        fullname: result.data.fullname,
-        username: result.data.username,
-        id: result.data.id,
+        email: result.email,
+        fullname: result.fullname,
+        username: result.username,
+        id: result.id,
       };
 
       setAuthState({
-        token: result.data.accessToken,
+        token: result.accessToken,
         authenticated: true,
         userData,
       });
 
-      axios.defaults.headers.common["Authorization"] = `Bearer ${result.data.accessToken}`;
-
-      await SecureStore.setItemAsync(TOKEN_KEY, result.data.accessToken);
+      await SecureStore.setItemAsync(TOKEN_KEY, result.accessToken);
       await SecureStore.setItemAsync("userData", JSON.stringify(userData));
 
       return result;
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      console.log(e);
       return { error: true, message: (e as any).response.data.error };
     }
   };
@@ -120,7 +122,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     await SecureStore.deleteItemAsync(TOKEN_KEY);
     await SecureStore.deleteItemAsync("userData");
-    axios.defaults.headers.common["Authorization"] = "";
 
     setAuthState({
       token: null,

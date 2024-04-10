@@ -1,5 +1,4 @@
 import type { KyInstance } from "ky";
-import BookModel from "../services/db/model/book";
 
 export interface FileData {
   name: string;
@@ -8,10 +7,17 @@ export interface FileData {
   size?: number;
 }
 
-export interface CreateBookInput extends BookModel {
+export interface CreateBookInput {
+  id: string;
+  userId: string;
   name: string;
+  title: string;
+  author: string;
+  language: string;
+  percentageRead: number;
+  lastLocation: string;
   file: FileData;
-  folder: string;
+  coverLocalUri: string;
 }
 
 export interface CreateBookApiResponse {

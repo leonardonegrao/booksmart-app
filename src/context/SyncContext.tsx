@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import ky from "ky";
+import ky, { HTTPError } from "ky";
 import { CreateBookApiResponse, CreateBookInput, SyncProps } from "../@types/sync";
 import uploadBookFile from "../services/api/create-book/book-file-upload";
 import uploadBookCover from "../services/api/create-book/book-cover-upload";
@@ -23,24 +23,28 @@ export const SyncProvider = ({ children }: { children: React.ReactNode }) => {
       if (!isSyncEnabled) {
         throw new Error("Sync is disabled");
       }
-      // 1. create book in database
-      const response = await api.post("/books", {
-        json: {
-          id: input.id,
-          userId: input.userId,
-          name: input.name,
-          title: input.title,
-          author: input.author,
-          language: input.language,
-          percentageRead: input.percentageRead,
-          lastLocation: input.lastLocation,
-        },
-      }).json<CreateBookApiResponse>();
-      // 2. upload book file to cloud
-      await uploadBookFile(response.bookSignedUrl, input.file.uri);
-      // 3. upload book cover to cloud
-      await uploadBookCover(response.coverSignedUrl, input.coverLocalUri);
-      // 4. update book in database
+
+      const requestBody = {
+        id: input.id,
+        userId: input.userId,
+        name: input.name,
+        title: input.title,
+        author: input.author,
+        language: input.language,
+        percentageRead: input.percentageRead,
+        lastLocation: input.lastLocation,
+      };
+      
+      try {
+        const response = await api.post("books/upload", {
+          json: requestBody,
+        }).json<CreateBookApiResponse>();
+
+        await uploadBookFile(response.bookSignedUrl, input.file.uri);
+        await uploadBookCover(response.coverSignedUrl, input.coverLocalUri);
+      } catch (e: any) {
+        console.error(e.message);
+      }
     },
   };
 
