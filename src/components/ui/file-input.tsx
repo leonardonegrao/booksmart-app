@@ -3,22 +3,16 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "rea
 
 import { UploadSquare } from "../icons";
 import { useState } from "react";
+import { FileData } from "@/src/@types/sync";
 
 interface FileInputProps {
   title: string;
   instruction: string;
   fileTypesLabel?: string;
   fileTypes: string | string[];
-  value: HandleUploadResponse | null;
+  value: FileData | null;
   // eslint-disable-next-line no-unused-vars
-  onChange: (file: HandleUploadResponse) => Promise<void>;
-}
-
-export interface HandleUploadResponse {
-  name: string;
-  uri: string;
-  type?: string;
-  size?: number;
+  onChange: (file: FileData) => Promise<void>;
 }
 
 type FileInputState = "default" | "uploading" | "uploaded" | "error";
@@ -38,7 +32,7 @@ export default function FileInput({ title, instruction, fileTypesLabel, fileType
 
       const fileData = assets[0];
 
-      const file: HandleUploadResponse = {
+      const file: FileData = {
         name: fileData.name,
         uri: fileData.uri,
         type: fileData.mimeType,
