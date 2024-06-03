@@ -58,7 +58,7 @@ export default function SettingsScreen() {
   const handleClearLibrary = async () => {
     try {
       console.log("clear library");
-      //storage.actions.drop("book"); 
+      //storage.actions.drop("book");
     } catch (error) {
       alert("There was an issue clearing the library, please try again.");
     }

@@ -19,11 +19,11 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     const result = await onLogin!(email, password);
 
-    if (result && result.error) {
+    if (result && "error" in result) {
       alert(result.message);
     }
 
-    if (result.status === 200) {
+    if (result && "accessToken" in result) {
       router.replace("/(tabs)");
     }
   };
