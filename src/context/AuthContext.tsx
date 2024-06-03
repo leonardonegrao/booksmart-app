@@ -22,18 +22,23 @@ type AuthenticationData = {
   userData: UserData | Record<string, never>;
 }
 
-interface LoginApiResponse extends UserData {
-  error?: string;
+interface LoginApiResponseError {
+  error: true;
   message: string;
+}
+
+interface LoginApiResponseSuccess extends UserData {
   accessToken: string;
 }
+
+type LoginApiResponse = LoginApiResponseError | LoginApiResponseSuccess;
 
 interface AuthProps {
   authState?: { token: string | null; authenticated: boolean | null, userData:  UserData | Record<string, never> };
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
   onRegister?: (input: RegisterInput) => Promise<any>;
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
-  onLogin?: (email: string, password: string) => Promise<any>;
+  onLogin?: (email: string, password: string) => Promise<LoginApiResponse>;
   // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
   onLogout?: () => Promise<any>;
 }
@@ -87,32 +92,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
   
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<LoginApiResponse> => {
     try {
       const result = await ky.post(`${API_URL}/users/login`, { json: { email, password } })
         .json<LoginApiResponse>();
 
-      if (result.error) {
-        return { error: true, message: result.message };
+      if ("error" in result && result.error) {
+        return { error: true, message: (result as LoginApiResponseError).message };
       }
 
+      const data = result as LoginApiResponseSuccess;
+
       const userData = {
-        email: result.email,
-        fullname: result.fullname,
-        username: result.username,
-        id: result.id,
+        email: data.email,
+        fullname: data.fullname,
+        username: data.username,
+        id: data.id,
       };
 
       setAuthState({
-        token: result.accessToken,
+        token: data.accessToken,
         authenticated: true,
         userData,
       });
 
-      await SecureStore.setItemAsync(TOKEN_KEY, result.accessToken);
+      await SecureStore.setItemAsync(TOKEN_KEY, data.accessToken);
       await SecureStore.setItemAsync("userData", JSON.stringify(userData));
 
-      return result;
+      return {
+        ...data,
+      };
     } catch (e) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return { error: true, message: (e as any).response.data.error };
@@ -130,7 +139,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const value = {
+  const value: AuthProps = {
     authState,
     onRegister: register,
     onLogin: login,

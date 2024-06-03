@@ -13,10 +13,11 @@ export interface DatabaseService {
     delete: (db: Database, bookId: string) => Promise<void>;
     getAll: (db: Database) => Promise<Collection<BookModel>>;
     findOne: (db: Database, bookId: string) => Promise<BookModel>;
+    deleteAll: (db: Database) => Promise<void>;
   };
   highlights: {
     insert: (db: Database, highlightData: InsertHighlightInput) => Promise<HighlightModel>;
-    delete: () => void;
+    delete: (db: Database, highlightId: string) => Promise<void>;
   };
 }
 
@@ -82,6 +83,11 @@ const databaseService: DatabaseService = {
     findOne: async (db: Database, bookId: string) => {
       return db.get<BookModel>("books").find(bookId);
     },
+    deleteAll: async (db: Database) => {
+      const books = await db.get<BookModel>("books").query().fetch();
+      const deletedBooks = books.map(book => book.prepareDestroyPermanently());
+      db.batch(deletedBooks);
+    },
   },
   highlights: {
     insert: async (db: Database, highlightData: InsertHighlightInput) => {
@@ -96,7 +102,13 @@ const databaseService: DatabaseService = {
 
       return newHighlight;
     },
-    delete: () => {},
+    delete: async (db:Database, highlightId: string) => {
+      const highlight = await db.get<HighlightModel>("highlights").find(highlightId);
+
+      await db.write(async () => {
+        await highlight.destroyPermanently();
+      });
+    },
   },
 };
 
