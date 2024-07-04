@@ -9,6 +9,7 @@ export default function Input({children, ...rest}: InputProps) {
     <View style={styles.container}>
       <TextInput
         style={styles.input}
+        placeholderTextColor="#939393"
         {...rest}
       />
 
