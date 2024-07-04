@@ -11,17 +11,22 @@ import { useAuth } from "@/src/context/AuthContext";
 import logo from "@/src/assets/images/logo/logo-orange-text.png";
 
 export default function LoginScreen() {
+  const [formState, setFormState] = useState<"default" | "loading" | "disabled">("default");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { onLogin } = useAuth();
 
   const handleLogin = async () => {
+    setFormState("loading");
+
     const result = await onLogin!(email, password);
 
     if (result && "error" in result) {
       alert(result.message);
     }
+
+    setFormState("default");
 
     if (result && "accessToken" in result) {
       router.replace("/(tabs)");
@@ -58,6 +63,7 @@ export default function LoginScreen() {
         <Button
           label="Login"
           onPress={handleLogin}
+          state={formState}
         />
       </View>
 

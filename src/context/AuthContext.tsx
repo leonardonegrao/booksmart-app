@@ -44,7 +44,7 @@ interface AuthProps {
 }
 
 const TOKEN_KEY = "token";
-export const API_URL = "http://192.168.1.206:3333";
+export const API_URL = "http://localhost:3333";
 const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = () => {
@@ -94,12 +94,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   
   const login = async (email: string, password: string): Promise<LoginApiResponse> => {
     try {
-      const result = await ky.post(`${API_URL}/users/login`, { json: { email, password } })
-        .json<LoginApiResponse>();
 
-      if ("error" in result && result.error) {
-        return { error: true, message: (result as LoginApiResponseError).message };
-      }
+      const result = await ky.post(`${API_URL}/users/login`, {
+        json: { email, password },
+      }).json<LoginApiResponse>();
 
       const data = result as LoginApiResponseSuccess;
 
@@ -123,8 +121,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ...data,
       };
     } catch (e) {
+      if ((e as any).response.status === 401) {
+        return { error: true, message: "Invalid email or password" };
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return { error: true, message: (e as any).response.data.error };
+      return { error: true, message: (e as any).response.message };
     }
   };
 
